@@ -24,6 +24,10 @@ int colocar(Proceso *proceso, int tiempo) {
   read(notificacion, &tiempo, sizeof(int));
 }
 
+// Asegurar que hay un solo main
+#ifndef _MAIN_DEFINIDO_
+#define _MAIN_DEFINIDO_
+
 int main() {
   int tiempo;
   Proceso proceso;
@@ -46,3 +50,5 @@ int main() {
     write(notificacion, &tiempo, sizeof(int));
   }
 }
+
+#endif
