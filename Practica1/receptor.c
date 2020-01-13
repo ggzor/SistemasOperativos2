@@ -21,6 +21,9 @@ int main() {
     // Recibir cada proceso de uno en uno
     while (read(recepcion, &proceso, sizeof(proceso)) > 0)
         recibir(&proceso);
+
+    // Indicar que se termino la producción
+    recibir(NULL);
     
     return EXIT_SUCCESS;
 }

@@ -8,6 +8,7 @@
  * La interfaz mínima que debe implementar cada planeador:
  *  - recibir(proceso):
  *      Recibe un proceso de creación nueva y decide como planificarlo a largo plazo.
+ *      Si se recibe NULL, quiere decir que no habrá más procesos.
  *  - operar(lista):
  *      Realiza la planificacion a corto plazo, una vez que termina un proceso, debe
  *      agregarlo a la lista con las estadísticas correspondientes. Devuelve el tiempo
