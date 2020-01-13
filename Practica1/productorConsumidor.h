@@ -4,8 +4,9 @@
 // La definición es externa para que se pueda redefinir
 struct Memoria;
 
-// La memoria compartida creada automaticamente
-Memoria *memoria;
+// La memoria compartida creada automaticamente que se establecerá
+// en 0 todos sus campos al solicitarla por primera vez.
+struct Memoria *memoria;
 
 // Productor
 #define producir(code) {iniciarProduccion(); code; terminarProduccion();}
