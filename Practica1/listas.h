@@ -1,7 +1,10 @@
 #ifndef __LISTAS_H__
 #define __LISTAS_H__
 
+#include "tipos.h"
+
 typedef struct Nodo {
+  Proceso proceso;
   Nodo *siguiente;
 } Nodo;
 
