@@ -8,7 +8,7 @@
 #define DESPACHADOR_NOTIFICACION "/tmp/pipeDespachadorNotificacion"
 
 int abierto = 0, recepcion, notificacion;
-int colocar(Proceso *proceso, int tiempo) {
+void colocar(Proceso *proceso, int tiempo) {
   if (!abierto) {
     // Abrir canales de comunicación
     recepcion = abrirPipeEscritura(DESPACHADOR_RECEPCION);
@@ -22,6 +22,15 @@ int colocar(Proceso *proceso, int tiempo) {
 
   // Esperar termino de ejecución
   read(notificacion, &tiempo, sizeof(int));
+}
+
+void terminarDespacho() {
+  // Con cerrar los pipes se puede terminar el despacho
+  if (abierto) {
+    close(recepcion);
+    close(notificacion);
+    abierto = 0;
+  }
 }
 
 // Asegurar que hay un solo main
@@ -39,7 +48,11 @@ int main() {
   // Ciclo principal del despachador
   while (1) {
     // Recibir un proceso
-    read(recepcion, &tiempo, sizeof(int));
+    if (read(recepcion, &tiempo, sizeof(int)) <= 0) {
+      // Si no se puedo leer, quiere decir que ya terminó.
+      break;
+    }
+
     read(recepcion, &proceso, sizeof(Proceso));
 
     // Ejecutar por un tiempo dado

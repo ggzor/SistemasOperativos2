@@ -7,9 +7,12 @@
  * La interfaz mínima para el despachador de procesos:
  *  - colocar(proceso, tiempo):
  *      Solicita al despachador ejecutar el proceso dado por un intervalo de tiempo dado.
+ *  - terminarDespacho():
+ *      Notifica al despachador que no se colocarán más procesos.
  * Notas:
  *  - La llamada es bloqueante en el proceso que la llama.
  **/
 void colocar(Proceso *proceso, int tiempo);
+void terminarDespacho();
 
 #endif // __DESPACHADOR_H__

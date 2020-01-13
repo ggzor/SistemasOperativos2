@@ -1,6 +1,7 @@
 // Para que no se incluya otro main de alguna interfaz
 #define _MAIN_DEFINIDO_
 
+#include "despachador.h"
 #include "listas.h"
 #include "planeador.h"
 #include "utilerias.h"
@@ -19,6 +20,9 @@ int main() {
 
   // Llevar a cabo las planeaciones
   int tiempoTotal = operar(cabeza);
+
+  // Avisar al despachador de la finalización
+  terminarDespacho();
 
   // Ignorar primer nodo centinela
   cabeza = cabeza->siguiente;
