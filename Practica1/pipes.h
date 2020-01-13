@@ -5,14 +5,15 @@
  * Abre un pipe nombrado para escribir.
  * 
  * Notas:
- *   - Si hay un pipe existente lo borra y lo vuelve a crear.
+ *   - Si el pipe no existe lo crea, de lo contrario solo lo abre para escritura.
  **/
 int abrirPipeEscritura(const char *nombre);
 
-/** Abre un pipe nombrado para leer.
+/** 
+ * Abre un pipe nombrado para leer.
  * 
  * Notas:
- *   - Si el pipe no existe, se espera de forma ocupada hasta que se cree.
+ *   - Si el pipe no existe lo crea, de lo contrario solo lo abre para lectura.
  **/
 int abrirPipeLectura(const char *nombre);
 
