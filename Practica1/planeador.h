@@ -10,7 +10,8 @@
  *      Recibe un proceso de creación nueva y decide como planificarlo a largo plazo.
  *  - operar(lista):
  *      Realiza la planificacion a corto plazo, una vez que termina un proceso, debe
- *      agregarlo a la lista con las estadísticas correspondientes.
+ *      agregarlo a la lista con las estadísticas correspondientes. Devuelve el tiempo
+ *      que tardó en ejecutar todos los procesos.
  * 
  * Esta interfaz, permite que los planificadores decidan, de forma independiente,
  * como van a comunicarse internamente y que recursos van a utilizar.
@@ -20,6 +21,6 @@
  **/
 
 void recibir(Proceso *proceso);
-void operar(Nodo *lista);
+int operar(Nodo *lista);
 
 #endif // __PLANEADOR_H__
