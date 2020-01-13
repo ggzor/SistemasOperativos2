@@ -33,8 +33,8 @@ int main() {
   Proceso proceso;
 
   // Abrir canales de comunicación
-  recepcion = abrirPipeLectura(PIPE_DESPACHADOR_RECEPCION);
-  notificacion = abrirPipeEscritura(PIPE_DESPACHADOR_NOTIFICACION);
+  recepcion = abrirPipeLectura(DESPACHADOR_RECEPCION);
+  notificacion = abrirPipeEscritura(DESPACHADOR_NOTIFICACION);
 
   // Ciclo principal del despachador
   while (1) {
