@@ -3,8 +3,10 @@
 
 typedef struct {
     int nombre;
-    int tiempo_espera;
+    int tiempo;
     int prioridad;
+
+    int espera;
  } Proceso;
 
 #endif // __TIPOS_H__
