@@ -6,24 +6,33 @@ struct Memoria;
 
 // La memoria compartida creada automaticamente que se establecerá
 // en 0 todos sus campos al solicitarla por primera vez.
-struct Memoria *memoria;
+extern struct Memoria *memoria;
 
 // Productor
-#define producir(code) {iniciarProduccion(); code; terminarProduccion();}
-void iniciarProduccion();
+/**
+ * Para usar esta macro, se deben definir las macros CAPACIDAD y TAMANO
+ * que representan la capacidad de producción y el tamaño de la estructura
+ * memoria, respectivamente.
+ **/
+#define producir(code) {iniciarProduccion(CAPACIDAD, TAMANO); code; terminarProduccion();}
+void iniciarProduccion(int capacidad, int tamano);
 void terminarProduccion();
 // Este método debe ser llamado cuando se completa la producción
 void completarProduccion();
 
 // Consumidor
 /** 
- * Se debe declarar una variable del tipo entero siempre que se invoque la macro.
+ * Para usar esta macro, se deben definir las macros CAPACIDAD y TAMANO
+ * que representan la capacidad de producción y el tamaño de la estructura
+ * memoria, respectivamente.
+ *
+ * Se debe declarar una variable del tipo entero "terminado" siempre que se invoque la macro.
  * Esta variable se pondrá en 1 después de que algún otro proceso haya llamado
  * completarProduccion().
  **/
-#define consumir(code) {terminado = iniciarConsumo(); code; terminarConsumo();}
+#define consumir(code) {terminado = iniciarConsumo(CAPACIDAD, TAMANO); code; terminarConsumo();}
 // Se debe devolver 1 cuando ya se haya llamado completarProduccion().
-int iniciarConsumo();
+int iniciarConsumo(int capacidad, int tamano);
 void terminarConsumo();
 
 #endif // __PRODUCTOR_CONSUMIDOR__
