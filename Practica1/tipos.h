@@ -6,7 +6,8 @@ typedef struct {
     int tiempo;
     int prioridad;
 
-    int espera;
+    int inicio;
+    int final;
  } Proceso;
 
 #endif // __TIPOS_H__
