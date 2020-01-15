@@ -14,7 +14,7 @@
 #define SALIDA "salida.txt"
 
 int main() {
-  int fd;
+  int fd, ejecucion, espera, total;
   Nodo primero;
   Nodo *cabeza = &primero;
 
@@ -31,15 +31,19 @@ int main() {
     exitError("No se pudo crear el archivo de salida.");
 
   // Información de los procesos
-  fprintf(fd, "Tiempo total: %d\n", tiempoTotal);
-  fprintf(fd, "PID Tiempo Prioridad Espera Total\n");
-  while (cabeza != NULL) {
-    fprintf(fd, "\n%3d %6d %9d %6d %5d",
+  dprintf(fd, "Tiempo total: %d\n", tiempoTotal);
+  dprintf(fd, "PID Tiempo Prioridad Espera Total\n");
+  while (cabeza != NULL) { 
+    ejecucion = cabeza->proceso.tiempo;
+    total = cabeza->proceso.final - cabeza->proceso.inicio;
+    espera = total - ejecucion;
+
+    dprintf(fd, "\n%3d %6d %9d %6d %5d",
               cabeza->proceso.nombre,
               cabeza->proceso.tiempo,
               cabeza->proceso.prioridad,
-              cabeza->proceso.espera,
-              cabeza->proceso.tiempo + cabeza->proceso.espera);
+              espera,
+              total);
 
     cabeza = cabeza->siguiente;
   }
