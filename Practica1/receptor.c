@@ -13,17 +13,17 @@
 #define RECEPTOR "/tmp/pipeReceptor"
 
 int main() {
-    int recepcion;
-    Proceso proceso;
+  int recepcion;
+  Proceso proceso;
 
-    recepcion = abrirPipeLectura(RECEPTOR);
+  recepcion = abrirPipeLectura(RECEPTOR);
 
-    // Recibir cada proceso de uno en uno
-    while (read(recepcion, &proceso, sizeof(proceso)) > 0)
-        recibir(&proceso);
+  // Recibir cada proceso de uno en uno
+  while (read(recepcion, &proceso, sizeof(proceso)) > 0)
+    recibir(&proceso);
 
-    // Indicar que se termino la producción
-    recibir(NULL);
-    
-    return EXIT_SUCCESS;
+  // Indicar que se termino la producción
+  recibir(NULL);
+  
+  return EXIT_SUCCESS;
 }
