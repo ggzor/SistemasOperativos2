@@ -3,6 +3,7 @@
 #include "utilerias.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #include <sys/ipc.h>
 #include <sys/sem.h>
@@ -63,6 +64,9 @@ void iniciarProduccion(int capacidad, int tamano) {
 
     _inicializarSemaforos(capacidad);
     _aperturaMemoria(tamano);
+
+    // Inicializar en 0
+    memset(memoria, 0, tamano);
 
     inicializado = 1;
   }
