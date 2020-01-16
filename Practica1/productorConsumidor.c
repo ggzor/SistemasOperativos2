@@ -88,7 +88,7 @@ void completarProduccion() {
 
 int iniciarConsumo(int capacidad, int tamano) {
   if (!inicializado) {
-    abrirSemaforo(KEY_SEMAFORO);
+    semaforosMemoria = abrirSemaforo(KEY_SEMAFORO);
     _aperturaMemoria(tamano);
 
     inicializado = 1;
