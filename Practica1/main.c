@@ -1,5 +1,6 @@
 #include <sys/ipc.h>
 #include <sys/sem.h>
+#include <sys/shm.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -58,6 +59,9 @@ int main(int argc, char **argv) {
   // Limpieza de recursos
   if (semctl(semget(0x12, 0, 0666), 0, IPC_RMID) >= 0)
     printf("Se borró el semáforo de la ejecución anterior.\n");
+
+  if (shmctl(shmget(0x13, 4, 0666), IPC_RMID, 0) >= 0)
+    printf("Se borró el segmento de memoria compartida de la ejecución anterior.\n");
 
   // Ejecución de comandos
   snprintf(comando, MAX_LEN, "bin/lectorProcesos %s %d", lista, semilla);
