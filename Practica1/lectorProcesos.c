@@ -47,7 +47,6 @@ int recoleccionProcesos(FILE * file, int numeroProcesos,Proceso *listaProcesos, 
 }
 
 void determinarAleatorios(int *tiempoDormir, int *numeroProcesos){
-  srand(time(NULL));
   *tiempoDormir = rand() % MAX_TEMPORIZADOR + MIN_TEMPORIZADOR;
   *numeroProcesos = rand() % MAX_PROCESOS + MIN_PROCESOS;
 }
@@ -61,7 +60,7 @@ void envioProcesos(int pd, Proceso *listaProcesos, int numeroProcesos){
   #endif
 
   if(data_write != sizeof(Proceso)*numeroProcesos)
-    exitError("Error en el envio de procesos");
+    terminarProcesos("Error en el envio de procesos");
 }
 
 int main(int argc, char **argv){
@@ -73,16 +72,22 @@ int main(int argc, char **argv){
   int tiempoDormir = 0;
   int numeroProcesos = 0;
   int flagSucces = 0;
+  int semilla = 0;
 
-  if(argc != 2){
-    printf("Uso: ./lectorProceso <Nombre_Archivo> \n"
+  if(!(argc == 2 || argc == 3)){
+    printf("Uso: ./lectorProceso <lista-procesos> [semilla=0]\n"
            "  Recolecta la información de los proceso recolectados en el lectorProcesos\n");
-    exit(EXIT_FAILURE);
+    terminarProcesos("");
   }
+
+  if (argc == 3)
+    semilla = atoi(argv[2]);
+
+  srand(semilla);
 
   file = fopen(argv[1], "r");
   if(file == NULL)
-      exitError("Error en la apertura del archivo de procesos - ");
+      terminarProcesos("Error en la apertura del archivo de procesos - ");
 
   pd = abrirPipeEscritura(RECEPTOR);
 
@@ -95,7 +100,7 @@ int main(int argc, char **argv){
         flagSucces = sleep(tiempoDormir);
         tiempo += tiempoDormir;
         if( flagSucces == -1)
-            exitError("Error en la suspensión del proceso - ");
+            terminarProcesos("Error en la suspensión del proceso - ");
     }
   } while(!feof(file));
 
