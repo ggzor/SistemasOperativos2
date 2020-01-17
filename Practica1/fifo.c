@@ -36,7 +36,7 @@ void recibir(Proceso *proceso) {
 
 int operar(Nodo *lista) {
   int *inicio, *fin, *n;
-  Proceso *proceso;
+  Proceso proceso;
   int tiempo = 0;
   int terminado = 0;
 
@@ -48,7 +48,7 @@ int operar(Nodo *lista) {
         fin = &memoria->fin;
         n = &memoria->n;
 
-        proceso = &memoria->procesos[*fin];
+        memcpy(&proceso, &memoria->procesos[*inicio], sizeof(Proceso));
 
         // Incrementar variables de la cola circular
         *inicio = (*inicio + 1) % CAPACIDAD;
@@ -59,13 +59,15 @@ int operar(Nodo *lista) {
     });
 
     // Invocar al despachador
-    colocar(proceso, proceso->tiempo);
-    tiempo += proceso->tiempo;
+    colocar(&proceso, proceso.tiempo);
+    tiempo += proceso.tiempo;
 
     // Verificar el tiempo
-    proceso->final = tiempo;
+    proceso.final = tiempo;
 
     // Agregar para estadísticas
-    agregar(lista, proceso);
+    agregar(lista, &proceso);
   }
+
+  return tiempo;
 }
