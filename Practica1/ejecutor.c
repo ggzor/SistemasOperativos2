@@ -32,7 +32,7 @@ int main() {
 
   // Información de los procesos
   dprintf(fd, "Tiempo total: %d\n", tiempoTotal);
-  dprintf(fd, "PID Tiempo Prioridad Espera Total\n");
+  dprintf(fd, "PID Tiempo Prioridad Espera Total Inicio Final");
   while (cabeza != NULL) { 
     ejecucion = cabeza->proceso.tiempo;
     total = cabeza->proceso.final - cabeza->proceso.inicio;
@@ -40,7 +40,7 @@ int main() {
 
     dprintf(fd, "\n%3d %6d %9d %6d %5d",
               cabeza->proceso.nombre,
-              cabeza->proceso.tiempo,
+              ejecucion,
               cabeza->proceso.prioridad,
               espera,
               total);
