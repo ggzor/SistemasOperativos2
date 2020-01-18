@@ -82,6 +82,9 @@ void terminarProduccion() {
 }
 
 void completarProduccion() {
+  // Se espera a que el consumidor termine de consumir todos los procesos
+  semEsperarCero(semaforosMemoria, OCUPADOS);
+
   // Remover semáforos para provocar desbloqueo
   semctl(semaforosMemoria, 0, IPC_RMID);
 }

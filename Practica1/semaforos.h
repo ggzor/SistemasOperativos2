@@ -21,6 +21,8 @@
  *      Retorna. Número negativo en caso de haber ocurrido un error
  *   - SemDecremento. La accion contraria a semIncrementar. Decrementa en uno el valor del semaforo en uno
  *      Retorna. Número negativo en caso de haber ocurrido un error
+ *   - semEsperarCero: Espera a que el semáforo en el índice especificado llegue a cero.
+ *      Retorna. Número negativo en caso de haber ocurrido un error.
  *   - SemValor. Retorna el valor del semaforo seleccionado
  *      Retorna. Número negativo en caso de haber ocurrido un error
  *   - abrirSemaforo. Apertura de semaforo existente de manera obligatoria. Entra en un ciclo
@@ -44,6 +46,7 @@ union semun{
 
 int semIncrementar(int semaforo, int indice);
 int semDecrementar(int semaforo, int indice);
+int semEsperarCero(int semaforo, int indice);
 
 int semValor(int semaforo, int indice);
 

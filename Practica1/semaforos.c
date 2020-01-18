@@ -3,6 +3,7 @@
 
 struct sembuf decremento = { .sem_num = 0, .sem_op = -1, .sem_flg = 0 }; 
 struct sembuf incremento = { .sem_num = 0, .sem_op = +1, .sem_flg = 0 }; 
+struct sembuf cero       = { .sem_num = 0, .sem_op =  0, .sem_flg = 0 };
 
 int semIncrementar(int semaforo, int indice){
   incremento.sem_num = indice;
@@ -12,6 +13,11 @@ int semIncrementar(int semaforo, int indice){
 int semDecrementar(int semaforo, int indice){
   decremento.sem_num = indice;
   return semop(semaforo, &decremento, 1);
+}
+
+int semEsperarCero(int semaforo, int indice) {
+  cero.sem_num = indice;
+  return semop(semaforo, &cero, 1);
 }
 
 int semValor(int semaforo, int indice){
