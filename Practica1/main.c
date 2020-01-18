@@ -9,13 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-void ejecutarComando(const char *comando) {
-  if (fork() == 0) {
-    printf("Terminó con %d -- %s\n", system(comando), comando);
-    _exit(0);
-  }
-}
-
 void imprimirUso() {
   printf("Uso: bin/main [-s semilla=0] [-t] <planificador> <lista-procesos>\n"
           "  Planificadores disponibles:\n"
@@ -30,6 +23,8 @@ void imprimirUso() {
 
   exit(-1);
 }
+
+void ejecutarComando(const char *comando);
 
 #define MAX_LEN 100
 /**
@@ -106,4 +101,11 @@ int main(int argc, char **argv) {
   while (wait(0) != -1);
 
   return 0;
+}
+
+void ejecutarComando(const char *comando) {
+  if (fork() == 0) {
+    printf("Terminó con %d -- %s\n", system(comando), comando);
+    _exit(0);
+  }
 }
