@@ -16,6 +16,21 @@ void ejecutarComando(const char *comando) {
   }
 }
 
+void imprimirUso() {
+  printf("Uso: bin/main [-s semilla=0] [-t] <planificador> <lista-procesos>\n"
+          "  Planificadores disponibles:\n"
+          "    fifo: Planificador FIFO\n"
+          "    sjf:  Trabajo más corto primero\n"
+          "    rr:   Round-robin con quantum-variable por prioridad\n"
+          "\n"
+          "  Opciones:\n"
+          "    -s    La semilla es para la generación de números aleatorios (0 por defecto)\n"
+          "    -t    Realizar la simulación utilizando tiempo virtual, es decir\n"
+          "          usando sólo contadores y no \"sleep\"\n");
+
+  exit(-1);
+}
+
 #define MAX_LEN 100
 /**
  *  Programa principal para ejecutar todos los procesos
@@ -24,37 +39,49 @@ int main(int argc, char **argv) {
   char comando[MAX_LEN];
 
   // Recepción de parámetros
+  char op;
   char *planificador;
   char *lista;
   int semilla = 0;
+  int tiempoVirtualActivo = 0;
 
-  if (!(argc == 3 || argc == 4)) {
-    printf("Uso: bin/main <fifo|sjf|rr> <lista-procesos> [semilla=0]\n"
-           "  Planificadores disponibles:\n"
-           "    - fifo: Planificador FIFO\n"
-           "    - sjf:  Trabajo más corto primero\n"
-           "    - rr:   Round-robin con quantum-variable por prioridad\n"
-           "\n"
-           "  Notas:\n"
-           "    - La semilla es para la generación de números aleatorios en el\n"
-           "      proceso que lee los procesos\n");
-    exit(-1);
+  while ((op = getopt(argc, argv, ":s:t")) != -1) {
+    switch (op)
+    {
+      case 's':
+        semilla = atoi(optarg);
+        break;
+      case 't':
+        tiempoVirtualActivo = 1;
+        break;
+      case ':':
+        printf("ERROR: No se proporcionó un valor para la semilla.\n");
+        imprimirUso();
+      case '?':
+        printf("ERROR: Opción no reconocida: %c\n", optopt);
+        imprimirUso();
+      default:
+        imprimirUso();
+    }
   }
 
+  // Validar cantidad de argumentos
+  argc -= optind;
+  if (argc != 2) {
+    printf("ERROR: No se proporcionaron los argumentos necesarios.\n");
+    imprimirUso();
+  }
 
-  planificador = argv[1];
+  // Validar planificador existente
+  planificador = argv[optind];
   if (!((strncmp("fifo", planificador, 4) == 0) || 
         (strncmp("sjf",  planificador, 3) == 0) ||
         (strncmp("rr",   planificador, 2) == 0))) {
-    printf("El planificador \"%s\" no existe. Solo puede ser uno de los siguientes:\n"
-           "  - fifo, sjf o rr\n");
-    exit(-1);
+    printf("ERROR: El planificador \"%s\" no está disponible\n", planificador);
+    imprimirUso();
   }
 
-  lista = argv[2];
-
-  if (argc == 4)
-    semilla = atoi(argv[3]);
+  lista = argv[optind + 1];
 
   // Limpieza de recursos
   if (semctl(semget(0x12, 0, 0666), 0, IPC_RMID) >= 0)
