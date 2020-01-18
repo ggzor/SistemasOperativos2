@@ -2,6 +2,7 @@
 #include "semaforos.h"
 #include "utilerias.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -112,4 +113,12 @@ void terminarConsumo() {
   semIncrementar(semaforosMemoria, MUTEX);
   // Incrementar la cantidad de espacios libres
   semIncrementar(semaforosMemoria, LIBRES);
+}
+
+void limpiarRecursos() {
+  if (semctl(semget(KEY_SEMAFORO, 0, 0666), 0, IPC_RMID) >= 0)
+    printf("Se borró el semáforo del productor consumidor.\n");
+
+  if (shmctl(shmget(KEY_MEMORIA, 4, 0666), IPC_RMID, 0) >= 0)
+    printf("Se borró el segmento de memoria compartida del productor consumidor.\n");
 }

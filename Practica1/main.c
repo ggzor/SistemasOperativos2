@@ -1,3 +1,5 @@
+#include "productorConsumidor.h"
+
 #include <getopt.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
@@ -5,7 +7,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -79,12 +80,8 @@ int main(int argc, char **argv) {
 
   lista = argv[optind + 1];
 
-  // Limpieza de recursos
-  if (semctl(semget(0x12, 0, 0666), 0, IPC_RMID) >= 0)
-    printf("Se borró el semáforo de la ejecución anterior.\n");
-
-  if (shmctl(shmget(0x13, 4, 0666), IPC_RMID, 0) >= 0)
-    printf("Se borró el segmento de memoria compartida de la ejecución anterior.\n");
+  // Limpieza de recursos dejados por ejecuciones anteriores
+  limpiarRecursos();
 
   // Ejecución de comandos
   snprintf(comando, MAX_LEN, "bin/lectorProcesos %s %d %d", lista, semilla, tiempoVirtualActivo);
@@ -101,6 +98,9 @@ int main(int argc, char **argv) {
 
   // Esperar hijos
   while (wait(0) != -1);
+
+  // Limpiar recursos antes de terminar el programa
+  limpiarRecursos();
 
   return 0;
 }

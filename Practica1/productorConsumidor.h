@@ -35,4 +35,9 @@ void completarProduccion();
 int iniciarConsumo(int capacidad, int tamano);
 void terminarConsumo();
 
+// Limpia todos los recursos ocupados por el procesos de consumir y producir. 
+// Esta función se ejecutará al terminar la ejecución y al iniciar otra para
+// asegurar que los recursos estén en un estado limpio.
+void limpiarRecursos();
+
 #endif // __PRODUCTOR_CONSUMIDOR__
