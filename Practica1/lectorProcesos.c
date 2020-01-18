@@ -73,15 +73,16 @@ int main(int argc, char **argv){
   int numeroProcesos = 0;
   int flagSucces = 0;
   int semilla = 0;
+  int tiempoVirtualActivo;
 
-  if(!(argc == 2 || argc == 3)){
+  if(argc != 4){
     printf("Uso: ./lectorProceso <lista-procesos> [semilla=0]\n"
            "  Recolecta la información de los proceso recolectados en el lectorProcesos\n");
     terminarProcesos("");
   }
 
-  if (argc == 3)
-    semilla = atoi(argv[2]);
+  semilla = atoi(argv[2]);
+  tiempoVirtualActivo = atoi(argv[3]);
 
   srand(semilla);
 
@@ -97,7 +98,7 @@ int main(int argc, char **argv){
 
     if (numeroProcesos != 0){
         envioProcesos(pd, listaProcesos, numeroProcesos);
-        flagSucces = sleep(tiempoDormir);
+        flagSucces = tiempoVirtualActivo ? 0 : sleep(tiempoDormir);
         tiempo += tiempoDormir;
         if( flagSucces == -1)
             terminarProcesos("Error en la suspensión del proceso - ");

@@ -1,3 +1,4 @@
+#include <getopt.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
@@ -86,7 +87,7 @@ int main(int argc, char **argv) {
     printf("Se borró el segmento de memoria compartida de la ejecución anterior.\n");
 
   // Ejecución de comandos
-  snprintf(comando, MAX_LEN, "bin/lectorProcesos %s %d", lista, semilla);
+  snprintf(comando, MAX_LEN, "bin/lectorProcesos %s %d %d", lista, semilla, tiempoVirtualActivo);
   ejecutarComando(comando);
 
   snprintf(comando, MAX_LEN, "bin/%s-largo %d", planificador, semilla);
@@ -95,7 +96,8 @@ int main(int argc, char **argv) {
   snprintf(comando, MAX_LEN, "bin/%s-corto %d", planificador, semilla);
   ejecutarComando(comando);
 
-  ejecutarComando("bin/despachador");
+  snprintf(comando, MAX_LEN, "bin/despachador %d", tiempoVirtualActivo);
+  ejecutarComando(comando);
 
   // Esperar hijos
   while (wait(0) != -1);
