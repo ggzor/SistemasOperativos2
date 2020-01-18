@@ -1,5 +1,7 @@
 #!/bin/sh
 
+[ ! -d "bin" ] && mkdir bin
+
 gcc -o bin/main main.c \
     && compilacion/despachador \
     && compilacion/lectorProcesos \
