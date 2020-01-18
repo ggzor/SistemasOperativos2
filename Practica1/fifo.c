@@ -1,5 +1,5 @@
 #include "despachador.h"
-#include "planeador.h"
+#include "planificador.h"
 #include "productorConsumidor.h"
 
 #include <string.h>

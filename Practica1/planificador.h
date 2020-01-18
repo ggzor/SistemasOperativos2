@@ -1,11 +1,11 @@
-#ifndef __PLANEADOR_H__
-#define __PLANEADOR_H__
+#ifndef __PLANIFICADOR_H__
+#define __PLANIFICADOR_H__
 
 #include "listas.h"
 #include "tipos.h"
 
 /**
- * La interfaz mínima que debe implementar cada planeador:
+ * La interfaz mínima que debe implementar cada planificador:
  *  - recibir(proceso):
  *      Recibe un proceso de creación nueva y decide como planificarlo a largo plazo.
  *      Si se recibe NULL, quiere decir que no habrá más procesos.
@@ -24,4 +24,4 @@
 void recibir(Proceso *proceso);
 int operar(Nodo *lista);
 
-#endif // __PLANEADOR_H__
+#endif // __PLANIFICADOR_H__

@@ -2,7 +2,7 @@
 #define _MAIN_DEFINIDO_
 
 #include "pipes.h"
-#include "planeador.h"
+#include "planificador.h"
 #include "tipos.h"
 #include "utilerias.h"
 

@@ -1,5 +1,5 @@
 // Propias
-#include "planeador.h"
+#include "planificador.h"
 #include "semaforos.h"
 #include "pipes.h"
 #include "utilerias.h"

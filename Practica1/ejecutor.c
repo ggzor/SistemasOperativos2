@@ -3,7 +3,7 @@
 
 #include "despachador.h"
 #include "listas.h"
-#include "planeador.h"
+#include "planificador.h"
 #include "utilerias.h"
 
 #include <fcntl.h>
