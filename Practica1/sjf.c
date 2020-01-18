@@ -6,6 +6,7 @@
 #include "productorConsumidor.h"
 #include "tipos.h"
 #include "ordenamiento.h"
+#include "despachador.h"
 
 // No Estandar
 #include <unistd.h>
@@ -14,13 +15,17 @@
 // Estandar
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
-#define MAX_PROCESOS 20 // Dimension de la memoria compartida
+#define CAPACIDAD 10 // Dimension de la memoria compartida
 #define QUANTUM 5
 
 typedef struct Memoria {
-  int buffer[MAX_PROCESOS];
+  Proceso procesos[CAPACIDAD];
+  int n ;
 }Memoria;
+
+#define TAMANO sizeof(Memoria)
 
   /**
    * Funciones para algoritmo de planificación de procesos con politicas de Short Job First.
@@ -34,30 +39,33 @@ typedef struct Memoria {
    *          Aplica las politicas de planificación para simular el algoritmo de planificación
   **/
 
-int inicializado = 0, fdLector = 0, semaforosMemoria = 0;
+// int inicializado = 0, fdLector = 0, semaforosMemoria = 0;
 
 void _insercionOrdenada(Proceso *proceso, Proceso *array, int indiceSuperior){
   int i = indiceSuperior;
-  Proceso aux1;
-  Proceso aux2;
-
   // Asignacion de lugar a nuevo proceso. Ordenado de Mayor a Menor
   while(i > 0 &&  comparacionProcesos(&array[i-1], proceso) <= 0 )
     i--;
 
   // Desplazamiento a la derecha de los valores menores 
-  for(int j=indiceSuperior-1; j >= i; j--)
+  for(int j=indiceSuperior-1; j>=i; j--)
     array[j+1] = array[j];
-  array[i] = *proceso; 
+
+  memcpy(&array[i], proceso, sizeof(Proceso)); 
 }
 
 void recibir(Proceso *proceso){
+  int *n;
   if (proceso == NULL) {
     completarProduccion();
   } else {
-    producir(MAX_PROCESOS, {
-      int numeroProcesos = semValor(semaforosMemoria, 2); // Slots ocupados(Sin contar el que va entrar)
-      _insercionOrdenada(proceso, memoria.buffer, numeroProcesos);
+    producir({
+      n = &memoria->n;
+
+      printf("Insercion: %d\n", *n);
+      _insercionOrdenada(proceso, memoria->procesos, *n);
+      printf("Fin");
+      (*n)++;
     });
   }
 }
@@ -66,13 +74,16 @@ int operar(Nodo *lista){
   Proceso *proceso;
   int terminado = 0;
   int tiempo = 0;
+  int *n = NULL ;
 
   while (!terminado) {
     // Adquirir el último proceso
-    consumir(MAX_PROCESOS, {
+    consumir({
+      n = &memoria->n;
       if(!terminado){
-        int numeroProcesos = semValor(semaforosMemoria, 2); // Numero de slots ocupados(Ya se resto el que se va sacar)
-        proceso = &bufferCompartido[numeroProcesos];
+        int numeroProcesos = --(*n); // Numero de slots ocupados(Ya se resto el que se va sacar)
+        memcpy(&proceso, &memoria->procesos[numeroProcesos], sizeof(Proceso));
+      }
     }); 
 
     // Colocar en el despachador
@@ -84,10 +95,8 @@ int operar(Nodo *lista){
 
     // Agregar para estadísticas
     agregar(lista, proceso);
+
    }
-  }
 
-  // Retorna el tiempo total 
-  return tiempo;
+   return tiempo;
 }
-
