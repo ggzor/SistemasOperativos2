@@ -2,8 +2,9 @@
 
 [ ! -d "bin" ] && mkdir bin
 
-gcc -o bin/generador generador.c \
-    && gcc -o bin/main main.c productorConsumidor.c semaforos.c utilerias.c \
+gcc -o bin/generador generador.c -Wall \
+    && gcc -o bin/main main.c productorConsumidor.c semaforos.c utilerias.c -Wall \
     && compilacion/despachador \
     && compilacion/lectorProcesos \
-    && compilacion/fifo
+    && compilacion/fifo \
+    && compilacion/sjf
