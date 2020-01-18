@@ -65,7 +65,6 @@ void envioProcesos(int pd, Proceso *listaProcesos, int numeroProcesos){
 
 int main(int argc, char **argv){
   Proceso listaProcesos[MAX_PROCESOS];
-  int contadorProcoes = 0;
   FILE * file = NULL;
   int pd = 0;
   int tiempo = 0;

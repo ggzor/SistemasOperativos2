@@ -35,7 +35,7 @@ void recibir(Proceso *proceso) {
 }
 
 int operar(Nodo *lista) {
-  int *inicio, *fin, *n;
+  int *inicio, *n;
   Proceso proceso;
   int tiempo = 0;
   int terminado = 0;
@@ -45,7 +45,6 @@ int operar(Nodo *lista) {
     consumir({
       if (!terminado) {
         inicio = &memoria->inicio;
-        fin = &memoria->fin;
         n = &memoria->n;
 
         memcpy(&proceso, &memoria->procesos[*inicio], sizeof(Proceso));
