@@ -56,7 +56,7 @@ void envioProcesos(int pd, Proceso *listaProcesos, int numeroProcesos){
   #ifdef DEBUG
     printf("Numero de procesos enviados en la rafaga: %d\n", numeroProcesos);
     for(int i =0; i<numeroProcesos; i++)
-        printf("%d %d %d\n",listaProcesos[i].nombre,listaProcesos[i].prioridad,listaProcesos[i].tiempo);
+        printf("%d %d %d\n",listaProcesos[i].nombre,listaProcesos[i].tiempo,listaProcesos[i].prioridad);
   #endif
 
   if(data_write != sizeof(Proceso)*numeroProcesos)
