@@ -57,7 +57,7 @@ void _inicializarSemaforos(int capacidad) {
   semctl(semaforosMemoria, OCUPADOS, SETVAL, arg);
 }
 
-void iniciarProduccion(int capacidad, int tamano) {
+void inicializarProductor(int capacidad, int tamano) {
   if (!inicializado) {
     // Apertura del semáforo
     if ((semaforosMemoria = semget(KEY_SEMAFORO, 3, 0666 | IPC_CREAT)) < 0)
@@ -71,15 +71,34 @@ void iniciarProduccion(int capacidad, int tamano) {
 
     inicializado = 1;
   }
-  // Bloquear hasta que haya espacios libres
-  semDecrementar(semaforosMemoria, LIBRES);
+}
+
+void inicializarConsumidor(int capacidad, int tamano) {
+  if (!inicializado) {
+    semaforosMemoria = abrirSemaforo(KEY_SEMAFORO);
+    _aperturaMemoria(tamano);
+
+    inicializado = 1;
+  }
+}
+
+
+void adquirirMutexMemoria() {
   semDecrementar(semaforosMemoria, MUTEX);
 }
 
-void terminarProduccion() {
+void liberarMutexMemoria() {
   semIncrementar(semaforosMemoria, MUTEX);
-  // Incrementar la cantidad de espacios ocupados
-  semIncrementar(semaforosMemoria, OCUPADOS);
+}
+
+void iniciarProduccion() {
+  decrementarLibres();
+  adquirirMutexMemoria();
+}
+
+void terminarProduccion() {
+  liberarMutexMemoria();
+  incrementarOcupados();
 }
 
 void completarProduccion() {
@@ -90,29 +109,38 @@ void completarProduccion() {
   semctl(semaforosMemoria, 0, IPC_RMID);
 }
 
-int iniciarConsumo(int capacidad, int tamano) {
-  if (!inicializado) {
-    semaforosMemoria = abrirSemaforo(KEY_SEMAFORO);
-    _aperturaMemoria(tamano);
 
-    inicializado = 1;
-  }
-
-  // Bloquear hasta que haya espacios ocupados
-  if (semDecrementar(semaforosMemoria, OCUPADOS) < 0) {
+int iniciarConsumo() {
+  if (decrementarOcupados()) {
     // Terminar cuando no se pueda decrementar
     return 1;
   }
-  semDecrementar(semaforosMemoria, MUTEX);
+  adquirirMutexMemoria();
 
   // Si se pudo decrementar entonces se procede exitosamente
   return 0;
 }
 
 void terminarConsumo() {
-  semIncrementar(semaforosMemoria, MUTEX);
-  // Incrementar la cantidad de espacios libres
+  liberarMutexMemoria();
+  incrementarLibres();
+}
+
+
+int decrementarLibres() {
+  return semDecrementar(semaforosMemoria, LIBRES) < 0;
+}
+
+void incrementarLibres() {
   semIncrementar(semaforosMemoria, LIBRES);
+}
+
+int decrementarOcupados() {
+  return semDecrementar(semaforosMemoria, OCUPADOS) < 0;
+}
+
+void incrementarOcupados() {
+  semIncrementar(semaforosMemoria, OCUPADOS);
 }
 
 void limpiarRecursos() {

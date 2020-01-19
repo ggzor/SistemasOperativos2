@@ -17,6 +17,7 @@ typedef struct Memoria {
 void recibir(Proceso *proceso) {
   int *fin, *n;
 
+  inicializarProductor(CAPACIDAD, TAMANO);
   if (proceso == NULL) {
     completarProduccion();
   } else {
@@ -40,6 +41,7 @@ int operar(Nodo *lista) {
   int tiempo = 0;
   int terminado = 0;
 
+  inicializarConsumidor(CAPACIDAD, TAMANO);
   while (!terminado) {
     // Adquirir el último proceso
     consumir({
