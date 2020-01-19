@@ -7,4 +7,5 @@ gcc -o bin/generador generador.c -Wall \
     && compilacion/despachador \
     && compilacion/lectorProcesos \
     && compilacion/fifo \
-    && compilacion/sjf
+    && compilacion/sjf \
+    && compilacion/srtf

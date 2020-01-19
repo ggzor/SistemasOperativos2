@@ -17,6 +17,7 @@ void imprimirUso() {
           "    fifo: Planificador FIFO\n"
           "    sjf:  Trabajo más corto primero\n"
           "    rr:   Round-robin con quantum-variable por prioridad\n"
+          "    srtf: El trabajo con el menor tiempo restante primero\n"
           "\n"
           "  Opciones:\n"
           "    -s    La semilla es para la generación de números aleatorios (0 por defecto)\n"
@@ -73,7 +74,8 @@ int main(int argc, char **argv) {
   planificador = argv[optind];
   if (!((strncmp("fifo", planificador, 4) == 0) || 
         (strncmp("sjf",  planificador, 3) == 0) ||
-        (strncmp("rr",   planificador, 2) == 0))) {
+        (strncmp("rr",   planificador, 2) == 0) ||
+        (strncmp("srtf", planificador, 4) == 0))) {
     printf("ERROR: El planificador \"%s\" no está disponible\n", planificador);
     imprimirUso();
   }
