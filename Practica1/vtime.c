@@ -37,12 +37,7 @@ int inicializado;
 void inicializarMemoriaCompartida() {
   int shmid;
   if (!inicializado) {
-    // Borrar si existe
-    if ((shmid = shmget(KEY_VTIME_SHM, 0, 0666)) != -1)
-      shmctl(shmid, IPC_RMID, NULL);
-
     shmid = shmget(KEY_VTIME_SHM, sizeof(Memoria), 0666 | IPC_CREAT);
-    printf("%d\n", sizeof(Memoria));
 
     if (shmid == -1)
       terminarProcesos("No se pudo abrir la memoria compartida para el tiempo virtual");
@@ -82,7 +77,6 @@ int estaTiempoRealActivo() {
 
     tiempoRealVerificado = 1;
   }
-
   return tiempoRealActivo;
 }
 
@@ -151,23 +145,24 @@ int vtime() {
   }
 }
 
-void avanzarTiempo(int s) {
+int avanzarTiempo(int s) {
   int i, j;
+  int tiempoActual;
   int *n;
 
   if (estaTiempoRealActivo()) {
     sleep(s);
+    return time(NULL);
   } else {
     semDecrementar(mutex, 0);
     {
       n = &memoria->n;
 
       memoria->tiempoActual += s;
+      tiempoActual = memoria->tiempoActual;
 
       for (i = 0; i < *n; i++) {
         if (memoria->alarmas[i].tiempo <= memoria->tiempoActual) {
-          printf("Despertando %d pid, (n = %d)\n", memoria->alarmas[i].pid, *n);
-
           // Despertar proceso
           kill(memoria->alarmas[i].pid, SIGUSR1);
 
@@ -184,5 +179,15 @@ void avanzarTiempo(int s) {
       }
     }
     semIncrementar(mutex, 0);
+
+    return tiempoActual;
   }
+}
+
+void limpiarRecursosVTime() {
+  // Borrar memoria compartida
+  shmctl(shmget(KEY_VTIME_SHM, 0, 0666), IPC_RMID, NULL);
+
+  // Borrar semáforo
+  semctl(semget(KEY_VTIME, 0, 0666), 0, IPC_RMID);
 }

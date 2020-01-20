@@ -6,12 +6,12 @@
  **/
 
 // La cantidad máxima de procesos que van a interactuar con el tiempo virtual
-#define MAX_ALARMAS 3
+#define MAX_ALARMAS 5
 
 // Dormir la cantidad de tiempo especificada
 void vsleep(int s);
 
-// Obtener tiempo global actual
+// Obtener tiempo local actual
 int vtime();
 
 /** 
@@ -27,8 +27,13 @@ void usarTiempoReal(int tiempoRealActivo);
 
 /**
  * Avanza el tiempo por la cantidad de segundos especificada si se está en modo virtual,
- * de lo contrario, llama a sleep por el tiempo especificado.
+ * de lo contrario, llama a sleep por el tiempo especificado. Regresa el tiempo global actual.
  **/
-void avanzarTiempo(int s);
+int avanzarTiempo(int s);
+
+/**
+ * Limpiar recursos
+ **/
+void limpiarRecursosVTime();
 
 #endif // __VTIME_H__
