@@ -8,21 +8,18 @@
 #include "ordenamiento.h"
 #include "despachador.h"
 
-// No Estandar
 #include <unistd.h>
 #include <sys/sem.h>
 
-// Estandar
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
-#define CAPACIDAD 10 // Dimension de la memoria compartida
-#define QUANTUM 5
+#define CAPACIDAD 10
 
 typedef struct Memoria {
   Proceso procesos[CAPACIDAD];
-  int n ;
+  int n;
 }Memoria;
 
 #define TAMANO sizeof(Memoria)
@@ -39,62 +36,64 @@ typedef struct Memoria {
    *          Aplica las politicas de planificación para simular el algoritmo de planificación
   **/
 
-// int inicializado = 0, fdLector = 0, semaforosMemoria = 0;
 
-void _insercionOrdenada(Proceso *proceso, Proceso *array, int indiceSuperior){
-  int i = indiceSuperior;
+void _insercionOrdenada(Proceso *proceso, Proceso *array, int total){
+  int i = total;
+
   // Asignacion de lugar a nuevo proceso. Ordenado de Mayor a Menor
   while(i > 0 &&  comparacionProcesos(&array[i-1], proceso) <= 0 )
     i--;
 
   // Desplazamiento a la derecha de los valores menores 
-  for(int j=indiceSuperior-1; j>=i; j--)
+  for(int j=total-1; j >= i; j--)
     array[j+1] = array[j];
 
-  memcpy(&array[i], proceso, sizeof(Proceso)); 
+  array[i] = *proceso; 
 }
 
 void recibir(Proceso *proceso){
-  int *n;
+  int *n ;
   if (proceso == NULL) {
     completarProduccion();
   } else {
     producir({
       n = &memoria->n;
-
-      printf("Insercion: %d\n", *n);
       _insercionOrdenada(proceso, memoria->procesos, *n);
-      printf("Fin");
       (*n)++;
+      
     });
   }
 }
 
 void operar(Nodo *lista){
-  Proceso *proceso;
+  Proceso proceso;
   int terminado = 0;
   int tiempo = 0;
-  int *n = NULL ;
+  int *n;
 
   while (!terminado) {
     // Adquirir el último proceso
     consumir({
-      n = &memoria->n;
       if(!terminado){
-        int numeroProcesos = --(*n); // Numero de slots ocupados(Ya se resto el que se va sacar)
-        memcpy(&proceso, &memoria->procesos[numeroProcesos], sizeof(Proceso));
+        n = &memoria->n;
+        (*n)--;
+        memcpy(&proceso, &memoria->procesos[*n], sizeof(Proceso));
+      }else{
+        break;
       }
     }); 
 
-    // Colocar en el despachador
-    colocar(proceso, proceso->tiempo);
-    tiempo += proceso->tiempo;
+    // Invocar al despachador
+    colocar(&proceso, proceso.tiempo);
+    tiempo += proceso.tiempo;
 
     // Verificar el tiempo
-    proceso->final = tiempo;
+    proceso.final = tiempo;
 
     // Agregar para estadísticas
-    agregar(lista, proceso);
-
+    agregar(lista, &proceso);
    }
-}
+
+    // Retorna el tiempo total 
+    // return tiempo;
+  }

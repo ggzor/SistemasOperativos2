@@ -8,4 +8,6 @@ gcc -o bin/generador generador.c -Wall \
     && compilacion/lectorProcesos \
     && compilacion/fifo \
     && compilacion/sjf \
-    && compilacion/srtf
+    && compilacion/srtf \
+    && compilacion/rr \
+    && compilacion/rre 
