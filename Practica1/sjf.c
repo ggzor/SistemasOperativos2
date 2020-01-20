@@ -1,4 +1,3 @@
-// Propias
 #include "planificador.h"
 #include "semaforos.h"
 #include "pipes.h"
@@ -53,6 +52,8 @@ void _insercionOrdenada(Proceso *proceso, Proceso *array, int total){
 
 void recibir(Proceso *proceso){
   int *n ;
+
+  inicializarProductor(CAPACIDAD, TAMANO);
   if (proceso == NULL) {
     completarProduccion();
   } else {
@@ -65,35 +66,29 @@ void recibir(Proceso *proceso){
   }
 }
 
-void operar(Nodo *lista){
+void operar(Nodo *lista) {
   Proceso proceso;
   int terminado = 0;
-  int tiempo = 0;
   int *n;
 
+  inicializarConsumidor(CAPACIDAD, TAMANO);
   while (!terminado) {
     // Adquirir el último proceso
     consumir({
-      if(!terminado){
+      if (!terminado) {
         n = &memoria->n;
+        
         (*n)--;
         memcpy(&proceso, &memoria->procesos[*n], sizeof(Proceso));
-      }else{
+      } else {
         break;
       }
-    }); 
-
-    // Invocar al despachador
-    colocar(&proceso, proceso.tiempo);
-    tiempo += proceso.tiempo;
+    });
 
     // Verificar el tiempo
-    proceso.final = tiempo;
+    proceso.final = colocar(&proceso, proceso.tiempo);
 
     // Agregar para estadísticas
     agregar(lista, &proceso);
-   }
-
-    // Retorna el tiempo total 
-    // return tiempo;
   }
+}
