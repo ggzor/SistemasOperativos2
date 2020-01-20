@@ -2,6 +2,7 @@
 #include "pipes.h"
 #include "tipos.h"
 #include "utilerias.h"
+#include "vtime.h"
 
 // No estandares
 #include <unistd.h>
@@ -33,12 +34,12 @@
     Tiempos entre rafagas de procesos:  1-5 seg.
 */
 
-int recoleccionProcesos(FILE * file, int numeroProcesos,Proceso *listaProcesos, int tiempo){
+int recoleccionProcesos(FILE * file, int numeroProcesos,Proceso *listaProcesos){
   int procesosLeidos = 0;    
   while(procesosLeidos < numeroProcesos && (fscanf(file, "%d %d %d", &listaProcesos[procesosLeidos].nombre,
                                                           &listaProcesos[procesosLeidos].tiempo,
                                                           &listaProcesos[procesosLeidos].prioridad)) > 0){
-    listaProcesos[procesosLeidos].inicio = tiempo;
+    listaProcesos[procesosLeidos].inicio = vtime();
     fgetc(file);
     procesosLeidos++;
   }
@@ -67,21 +68,17 @@ int main(int argc, char **argv){
   Proceso listaProcesos[MAX_PROCESOS];
   FILE * file = NULL;
   int pd = 0;
-  int tiempo = 0;
   int tiempoDormir = 0;
   int numeroProcesos = 0;
-  int flagSucces = 0;
   int semilla = 0;
-  int tiempoVirtualActivo;
 
-  if(argc != 4){
+  if(argc != 3){
     printf("Uso: ./lectorProceso <lista-procesos> [semilla=0]\n"
            "  Recolecta la información de los proceso recolectados en el lectorProcesos\n");
     terminarProcesos("");
   }
 
   semilla = atoi(argv[2]);
-  tiempoVirtualActivo = atoi(argv[3]);
 
   srand(semilla);
 
@@ -93,14 +90,11 @@ int main(int argc, char **argv){
 
   do{
     determinarAleatorios(&tiempoDormir, &numeroProcesos);
-    numeroProcesos = recoleccionProcesos(file, numeroProcesos, listaProcesos, tiempo);
+    numeroProcesos = recoleccionProcesos(file, numeroProcesos, listaProcesos);
 
     if (numeroProcesos != 0){
         envioProcesos(pd, listaProcesos, numeroProcesos);
-        flagSucces = tiempoVirtualActivo ? 0 : sleep(tiempoDormir);
-        tiempo += tiempoDormir;
-        if( flagSucces == -1)
-            terminarProcesos("Error en la suspensión del proceso - ");
+        vsleep(tiempoDormir);
     }
   } while(!feof(file));
 

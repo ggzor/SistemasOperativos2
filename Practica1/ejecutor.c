@@ -10,6 +10,7 @@
 #include <unistd.h>
 
 #include <stdio.h>
+#include <limits.h>
 
 #define SALIDA "salida.txt"
 #define NPRIORIDADES 5
@@ -26,6 +27,8 @@ int esperaPorProceso;
 int espera;
 int i;
 
+int inicio = INT_MAX, final = 0;
+
 int main() {
   int fd, ejecucion, total;
   Nodo primero;
@@ -35,7 +38,7 @@ int main() {
   cabeza = &primero;
 
   // Llevar a cabo las planeaciones
-  int tiempoTotal = operar(cabeza);
+  operar(cabeza);
 
   // Avisar al despachador de la finalización
   terminarDespacho();
@@ -57,12 +60,20 @@ int main() {
     esperaTotal += espera;
     esperaPorPrioridad[auxiliar->proceso.prioridad - 1] += espera;
 
+    // Obtener el tiempo de inicio del primer proceso
+    if (auxiliar->proceso.inicio < inicio)
+      inicio = auxiliar->proceso.inicio;
+
+    // Obtener el tiempo final del último proceso
+    if (auxiliar->proceso.final > final)
+      final = auxiliar->proceso.final;
+
     auxiliar = auxiliar->siguiente;
   }
 
   // Información de los procesos
   dprintf(fd, "Cantidad procesos: %d\n", cantidadProcesos);
-  dprintf(fd, "Tiempo total: %d\n", tiempoTotal);
+  dprintf(fd, "Tiempo total: %d\n", final - inicio);
   dprintf(fd, "Espera total: %d\n", esperaTotal);
   if (cantidadProcesos > 0)
     dprintf(fd, "Espera promedio: %.2f\n", 1.0f * esperaTotal / cantidadProcesos);

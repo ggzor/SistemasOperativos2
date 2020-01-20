@@ -1,6 +1,7 @@
 #include "despachador.h"
 #include "despachador-comun.h"
 #include "pipes.h"
+#include "vtime.h"
 
 #include <unistd.h>
 #include <stdio.h>
@@ -10,13 +11,10 @@
 #ifndef _MAIN_DEFINIDO_
 #define _MAIN_DEFINIDO_
 
-int main(int argc, char **argv) {
+int main() {
   int tiempo;
   int recepcion, notificacion;
   Proceso proceso;
-
-  // Lectura de parámetros
-  int tiempoVirtualActivo = atoi(argv[1]);
 
   // Abrir canales de comunicación
   recepcion = abrirPipeLectura(DESPACHADOR_RECEPCION);
@@ -34,9 +32,7 @@ int main(int argc, char **argv) {
 
     // Ejecutar por un tiempo dado
     printf("Ejecutando %d por %ds.\n", proceso.nombre, tiempo);
-    
-    if (!tiempoVirtualActivo)
-      sleep(tiempo);
+    tiempo = avanzarTiempo(tiempo);
 
     // Notificar finalización de ejecución
     write(notificacion, &tiempo, sizeof(int));

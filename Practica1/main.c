@@ -1,4 +1,5 @@
 #include "productorConsumidor.h"
+#include "vtime.h"
 
 #include <getopt.h>
 #include <sys/ipc.h>
@@ -7,6 +8,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -84,9 +86,16 @@ int main(int argc, char **argv) {
 
   // Limpieza de recursos dejados por ejecuciones anteriores
   limpiarRecursos();
+  limpiarRecursosVTime();
+
+  if (tiempoVirtualActivo == 0)
+    printf("Usando tiempo real.\n");
+
+  // Usar tiempo virtual si se requiere
+  usarTiempoReal(tiempoVirtualActivo == 0);
 
   // Ejecución de comandos
-  snprintf(comando, MAX_LEN, "bin/lectorProcesos %s %d %d", lista, semilla, tiempoVirtualActivo);
+  snprintf(comando, MAX_LEN, "bin/lectorProcesos %s %d", lista, semilla);
   ejecutarComando(comando);
 
   snprintf(comando, MAX_LEN, "bin/%s-largo %d", planificador, semilla);
@@ -95,7 +104,7 @@ int main(int argc, char **argv) {
   snprintf(comando, MAX_LEN, "bin/%s-corto %d", planificador, semilla);
   ejecutarComando(comando);
 
-  snprintf(comando, MAX_LEN, "bin/despachador %d", tiempoVirtualActivo);
+  snprintf(comando, MAX_LEN, "bin/despachador");
   ejecutarComando(comando);
 
   // Esperar hijos
@@ -103,6 +112,7 @@ int main(int argc, char **argv) {
 
   // Limpiar recursos antes de terminar el programa
   limpiarRecursos();
+  limpiarRecursosVTime();
 
   return 0;
 }

@@ -35,10 +35,9 @@ void recibir(Proceso *proceso) {
   }
 }
 
-int operar(Nodo *lista) {
+void operar(Nodo *lista) {
   int *inicio, *n;
   Proceso proceso;
-  int tiempo = 0;
   int terminado = 0;
 
   inicializarConsumidor(CAPACIDAD, TAMANO);
@@ -59,16 +58,10 @@ int operar(Nodo *lista) {
       }
     });
 
-    // Invocar al despachador
-    colocar(&proceso, proceso.tiempo);
-    tiempo += proceso.tiempo;
-
-    // Verificar el tiempo
-    proceso.final = tiempo;
+    // Despachar proceso
+    proceso.final = colocar(&proceso, proceso.tiempo);
 
     // Agregar para estadísticas
     agregar(lista, &proceso);
   }
-
-  return tiempo;
 }

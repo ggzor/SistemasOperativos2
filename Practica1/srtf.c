@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define CAPACIDAD 10
+#define CAPACIDAD 25
 
 typedef struct {
   int restante;
@@ -47,17 +47,16 @@ void recibir(Proceso *proceso) {
 }
 
 
-int operar(Nodo *lista) {
+void operar(Nodo *lista) {
   int *n;
-  int i, restante;
+  int i, tiempoDespacho;
 
-  typedef enum { Despachar, Finalizar, Ultimo } Accion;
+  typedef enum { Despachar, Finalizar } Accion;
   Accion accion;
 
   Proceso proceso;
   PCB *procesos;
 
-  int tiempo = 0;
   int terminado = 0;
 
   inicializarConsumidor(CAPACIDAD, TAMANO);
@@ -71,6 +70,8 @@ int operar(Nodo *lista) {
 
         // Copiar proceso
         memcpy(&proceso, &procesos[0].proceso, sizeof(Proceso));
+        // Solo se asignará un segundo de despacho ya que no es el último
+        tiempoDespacho = 1;
 
         // Si el proceso ya está por terminar
         if (procesos[0].restante == 1) {
@@ -95,33 +96,23 @@ int operar(Nodo *lista) {
     } else if (memoria->n == 1) {
       // Copiar último proceso para ser despachado
       memcpy(&proceso, &memoria->procesos[0].proceso, sizeof(Proceso));
-      restante = memoria->procesos[0].restante;
+      tiempoDespacho = memoria->procesos[0].restante;
 
-      accion = Ultimo;
+      accion = Finalizar;
     } else {
       // Terminar planificación
       break;
     }
-    //printf("Terminado: %d, memoria->n = %d\n", terminado, memoria->n);
 
     switch (accion)
     {
-      case Finalizar:
-        proceso.final = tiempo + 1;
-        printf("Terminando: %d - %d (t = %d, pid = %d)\n", proceso.inicio, proceso.final, proceso.tiempo, proceso.nombre);
-        agregar(lista, &proceso);
       case Despachar:
         colocar(&proceso, 1);
-        tiempo += 1;
         break;
-      case Ultimo:
-        colocar(&proceso, restante);
-        tiempo += restante;
-        proceso.final = tiempo;
+      case Finalizar:
+        proceso.final = colocar(&proceso, tiempoDespacho);
         agregar(lista, &proceso);
         break;
     }
   }
-
-  return tiempo;
 }

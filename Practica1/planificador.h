@@ -11,8 +11,7 @@
  *      Si se recibe NULL, quiere decir que no habrá más procesos.
  *  - operar(lista):
  *      Realiza la planificacion a corto plazo, una vez que termina un proceso, debe
- *      agregarlo a la lista con las estadísticas correspondientes. Devuelve el tiempo
- *      que tardó en ejecutar todos los procesos.
+ *      agregarlo a la lista con las estadísticas correspondientes.
  * 
  * Esta interfaz, permite que los planificadores decidan, de forma independiente,
  * como van a comunicarse internamente y que recursos van a utilizar.
@@ -22,6 +21,6 @@
  **/
 
 void recibir(Proceso *proceso);
-int operar(Nodo *lista);
+void operar(Nodo *lista);
 
 #endif // __PLANIFICADOR_H__

@@ -70,7 +70,7 @@ void recibir(Proceso *proceso){
   }
 }
 
-int operar(Nodo *lista){
+void operar(Nodo *lista){
   Proceso *proceso;
   int terminado = 0;
   int tiempo = 0;
@@ -97,6 +97,4 @@ int operar(Nodo *lista){
     agregar(lista, proceso);
 
    }
-
-   return tiempo;
 }
