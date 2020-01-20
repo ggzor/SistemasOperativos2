@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <limits.h>
 
-#define SALIDA "salida.txt"
 #define NPRIORIDADES 5
 
 // Variables para estadísticas
@@ -29,11 +28,16 @@ int i;
 
 int inicio = INT_MAX, final = 0;
 
-int main() {
+int main(int argc, char **argv) {
   int fd, ejecucion, total;
   Nodo primero;
   Nodo *auxiliar;
   Nodo *cabeza;
+
+  if (argc != 2) {
+    terminarProcesos(
+      "No se proporcionó el nombre del archivo de salida");
+  }
 
   cabeza = &primero;
 
@@ -47,7 +51,7 @@ int main() {
   cabeza = cabeza->siguiente;
   auxiliar = cabeza;
 
-  if ((fd = creat(SALIDA, 0666)) < 0)
+  if ((fd = creat(argv[1], 0666)) < 0)
     exitError("No se pudo crear el archivo de salida.");
 
   // Calculo de estadísticas avanzadas

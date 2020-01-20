@@ -101,7 +101,8 @@ int main(int argc, char **argv) {
   snprintf(comando, MAX_LEN, "bin/%s-largo %d", planificador, semilla);
   ejecutarComando(comando);
 
-  snprintf(comando, MAX_LEN, "bin/%s-corto %d", planificador, semilla);
+  snprintf(comando, MAX_LEN, "bin/%s-corto salida-%s-%s-%s.txt", 
+            planificador, planificador, lista, tiempoVirtualActivo ? "vtime" : "real");
   ejecutarComando(comando);
 
   snprintf(comando, MAX_LEN, "bin/despachador");
