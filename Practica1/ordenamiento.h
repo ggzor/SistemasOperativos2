@@ -11,6 +11,8 @@
  *      > 0. El 1er proceso es mayor al segundo proceso 
  **/
 
-int comparacionProcesos(Proceso *p1, Proceso *p2);
+int comparacionProcesosT(Proceso *p1, Proceso *p2);
+
+int comparacionProcesosP(Proceso *p1, Proceso *p2);
 
 #endif
