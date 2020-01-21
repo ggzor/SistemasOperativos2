@@ -56,8 +56,12 @@ void recibir(Proceso *proceso) {
 
       recalcularProbabilidades();
 
+      printf("Asignación de probabilidades:\n");
       for (i = 0; i < *n; i++)
-        printf("PID %d = %.2f\n", procesos[i].proceso.nombre, procesos[i].probabilidad);
+        printf("  PID %d (%d) = %.2f\n", 
+          procesos[i].proceso.nombre, 
+          procesos[i].proceso.prioridad, 
+          procesos[i].probabilidad);
     });
   }
 }
@@ -88,8 +92,16 @@ void operar(Nodo *lista) {
         ganador = 1.0f * rand() / RAND_MAX;
         suma = 0.0f;
 
-        for (i = 0; i < *n && ganador < suma; i++)
+
+        for (i = 0; i < *n; i++) {
           suma += procesos[i].probabilidad;
+
+          // Ya se encontró al ganador
+          if (ganador <= suma)
+            break;
+        }
+
+        printf("Boleto: %.2f, Ganador: %d\n", ganador, procesos[i].proceso.nombre);
 
         // Copiar proceso
         memcpy(&proceso, &procesos[i].proceso, sizeof(Proceso));
@@ -100,11 +112,12 @@ void operar(Nodo *lista) {
           tiempoDespacho = procesos[i].restante;
           // Quitar los boletos
           memoria->totalBoletos -= procesos[i].boletos;
-          recalcularProbabilidades();
 
           // Compactar
           for (j = i + 1; j < *n; j++)
-            procesos[i - 1] = procesos[i];
+            procesos[j - 1] = procesos[j];
+
+          recalcularProbabilidades();
 
           // Notificar incremento de espacios libres
           (*n)--;
@@ -136,7 +149,7 @@ void operar(Nodo *lista) {
     switch (accion)
     {
       case Despachar:
-        colocar(&proceso, 1);
+        colocar(&proceso, tiempoDespacho);
         break;
       case Finalizar:
         proceso.final = colocar(&proceso, tiempoDespacho);
