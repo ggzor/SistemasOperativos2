@@ -18,8 +18,11 @@ void imprimirUso() {
           "  Planificadores disponibles:\n"
           "    fifo: Planificador FIFO\n"
           "    sjf:  Trabajo más corto primero\n"
-          "    rr:   Round-robin con quantum-variable por prioridad\n"
+          "    sjfp: Proceso con mayor prioridad primero\n"
+          "    rr:   Round-robin con quantum estatico \n"
+          "    rre:  Round-robin por epocas con quantum y vidas dependiente de prioridad\n"
           "    srtf: El trabajo con el menor tiempo restante primero\n"
+          "    lpp:  Lotería por prioridad\n"
           "\n"
           "  Opciones:\n"
           "    -s    La semilla es para la generación de números aleatorios (0 por defecto)\n"
@@ -76,8 +79,11 @@ int main(int argc, char **argv) {
   planificador = argv[optind];
   if (!((strncmp("fifo", planificador, 4) == 0) || 
         (strncmp("sjf",  planificador, 3) == 0) ||
+        (strncmp("sjfp",  planificador, 4) == 0) ||
         (strncmp("rr",   planificador, 2) == 0) ||
-        (strncmp("srtf", planificador, 4) == 0))) {
+        (strncmp("rre",   planificador, 3) == 0) ||
+        (strncmp("srtf", planificador, 4) == 0) ||
+        (strncmp("lpp",  planificador, 3) == 0))) {
     printf("ERROR: El planificador \"%s\" no está disponible\n", planificador);
     imprimirUso();
   }
@@ -101,8 +107,8 @@ int main(int argc, char **argv) {
   snprintf(comando, MAX_LEN, "bin/%s-largo %d", planificador, semilla);
   ejecutarComando(comando);
 
-  snprintf(comando, MAX_LEN, "bin/%s-corto salida-%s-%s-%s.txt", 
-            planificador, planificador, lista, tiempoVirtualActivo ? "vtime" : "real");
+  snprintf(comando, MAX_LEN, "bin/%s-corto salida-%s-%s-%s.txt %d", 
+            planificador, planificador, lista, tiempoVirtualActivo ? "vtime" : "real", semilla);
   ejecutarComando(comando);
 
   snprintf(comando, MAX_LEN, "bin/despachador");
