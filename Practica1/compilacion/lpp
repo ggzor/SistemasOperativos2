@@ -1,0 +1,6 @@
+#!/bin/sh
+
+gcc -o bin/lpp-corto lpp.c ejecutor.c pipes.c utilerias.c \
+    productorConsumidor.c semaforos.c listas.c despachador.c -Wall \
+&& gcc -o bin/lpp-largo lpp.c receptor.c pipes.c utilerias.c \
+    listas.c productorConsumidor.c semaforos.c despachador.c -Wall
