@@ -10,6 +10,7 @@
 #include <unistd.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <limits.h>
 
 #define NPRIORIDADES 5
@@ -34,10 +35,13 @@ int main(int argc, char **argv) {
   Nodo *auxiliar;
   Nodo *cabeza;
 
-  if (argc != 2) {
+  if (argc < 2) {
     terminarProcesos(
       "No se proporcionó el nombre del archivo de salida");
   }
+
+  if (argc >= 3)
+    srand(atoi(argv[2]));
 
   cabeza = &primero;
 
