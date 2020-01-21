@@ -70,7 +70,7 @@ void _restaurarVidas(){
   ProcesoE *procesos = memoria->procesos;
   int n  = memoria->n;
   for(int i=0; i<n; i++){
-      procesos[i].numeroVidas = pow(2, procesos[i].proceso.prioridad - 1) * 2 ; //procesos[i].proceso.prioridad * 2;
+      procesos[i].numeroVidas = pow(2, procesos[i].proceso.prioridad - 1) * 1.99 ; //procesos[i].proceso.prioridad * 2;
   }
 }
 
