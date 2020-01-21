@@ -1,0 +1,6 @@
+#!/bin/sh
+
+gcc -o bin/sjfp-corto sjfp.c ordenamiento.c ejecutor.c pipes.c utilerias.c \
+    productorConsumidor.c semaforos.c listas.c despachador.c -Wall \
+&& gcc -o bin/sjfp-largo sjfp.c ordenamiento.c receptor.c pipes.c utilerias.c \
+    listas.c productorConsumidor.c semaforos.c despachador.c -Wall
