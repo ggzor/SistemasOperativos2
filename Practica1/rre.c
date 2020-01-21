@@ -1,4 +1,3 @@
-// Propias
 #include "planificador.h"
 #include "semaforos.h"
 #include "pipes.h"
@@ -12,12 +11,12 @@
 #include <sys/sem.h>
 #include <sys/shm.h>
 
-
+#include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
-#define CAPACIDAD 10
+#define CAPACIDAD 20
 #define QUANTUM 5
 #define MUTEX    0
 #define LIBRES   1
@@ -38,44 +37,27 @@ typedef struct Memoria {
 }Memoria;
 
 #define TAMANO sizeof(Memoria)
-
   /**
-   * Funciones para algoritmo de planificación de procesos con politicas de Short Job First.
-   * _insercionOrdenda. Funcion encarga de insertar un nuevo proceso en la memoria compartida de manera 
-   *                  que se respete el orden. La función encargada de hacer la comparación entre procesos
-   *                  se encuentra definida en la cabecera ordenamiento.h
+   * Algoritmo de planificación: Round Robin Por Epocas.
+   * 
+   * Descripción del algoritmo.
+   *    - Los procesos entraran en una cola de procesos entrantes con un número de vidas igual a 0.
+   *    - Los proceos seran despachados conforme a su orden en la cola siempre y cuando tengan vidas por consumir durante esa epoca
+   *    - La cantidad de CPU otorgara variara dependiendo de su prioridad
+   *    - La cantidad de vidas por epoca variara dependiendo de su prioridad y sera reiniciada cada epoca, es decir, cuando todos los proceso tengan 0 vidas en la epoca
+   *      epoca actual
+   * 
    * Recibir. Función encarga de recibir Procesos en la parte del Receptor. Los procesos son pasados por el lector de procesos
    *          Tiene como tárea crear la lógica de comunicación con la funcion Operar que es ejecutada en otro proceso.
    * Operar. Función encargada de recibir Procesos en la parte del Ejecutor. Los procesos son mandados por el Receptor a tráves 
    *          de la función recibir.
    *          Aplica las politicas de planificación para simular el algoritmo de planificación
+   * _compactar. Compacta los procesos en memoria compartida despues de la eliminación de un proceso
+   * _restaurarVidas. Restaura las vidas de cada proceso en memoria compartida. Las politicas de asignación de vidas son proporcionales a su prioridad
+   * _insercion. Insecion de un proceso en memoria compartida
+   * _siguiente. Recupera el siguiente proceso en ser ejecutado. En caso de no existir ningun proceso con vidas en esa epoca, se retorna NULL 
   **/
 
- extern int semaforosMemoria;
-
-void _aperturaMemoriaE(int tamano) {
-  int shmId;
-
-  // Apertura de memoria compartida
-  if ((shmId = shmget(KEY_MEMORIA, tamano, 0666 | IPC_CREAT)) < 0)
-    terminarProcesos("Error en la creación de la memoria compartida");
-
-  // Enlace con memoria compartida
-  if ((memoria = (struct Memoria *)shmat(shmId, 0, 0)) < 0)
-    terminarProcesos("Error al enlazar la memoria compartida");
-}
-
-int _verificarFinal(const char *semaforo){
-  int banderaFinal = 0;
-  if(errno == EINVAL){
-    banderaFinal = 1;
-  }else {
-    char mensajeError[50];
-    sprintf(mensajeError,"Error en el semaforo de memoria: %s", semaforo);
-    exitError(mensajeError);
-  }
-  return banderaFinal;
-}
 
 void _compactar(ProcesoE *array, int i, int total){
     // Compactacion de memoria del lado derecho, i es el indice del hueco
@@ -88,63 +70,8 @@ void _restaurarVidas(){
   ProcesoE *procesos = memoria->procesos;
   int n  = memoria->n;
   for(int i=0; i<n; i++){
-      procesos[i].numeroVidas = procesos[i].proceso.prioridad * 2;
+      procesos[i].numeroVidas = pow(2, procesos[i].proceso.prioridad - 1) * 2 ; //procesos[i].proceso.prioridad * 2;
   }
-}
-
-int _ejecutarProceso(Nodo *lista, ProcesoE *siguiente, int *tiempo, int *rafagaCPU){
-  int banderaFinal = 0;
-  int *i = &memoria->i;
-  int *n = &memoria->n;
-  ProcesoE aux;
-  #ifdef INTERACTIVO
-  for(int i=0; i<*n ;i++){
-    printf("ID: %d - Faltante: %d\n", memoria->procesos[i].proceso.nombre, memoria->procesos[i].faltante);
-  }
-  getchar();
-  #endif
-
-  // Verificacion de finalizacion de proceso
-  if(siguiente->faltante <= QUANTUM){
-    memcpy(&aux, siguiente, sizeof(ProcesoE));
-    #ifdef INTERACTIVO
-    printf("Escribiendo ID: %d - Faltante: %d - indice: %d - total: %d\n", aux.proceso.nombre, aux.faltante, *i, *n);
-    getchar();
-    #endif
-
-    // Verificar el tiempo
-    *rafagaCPU = aux.faltante;
-    (*tiempo) += *rafagaCPU;
-    aux.proceso.final = *tiempo;
-
-    // Agregar para estadísticas
-    agregar(lista, &aux.proceso);
-
-    // Verificacion de compactacion
-    if( *i == (*n)-1)
-      *i = 0;
-    else{
-      _compactar(memoria->procesos, *i, *n);
-    }
-
-    // Actualizar numero de procesos
-    (*n)--;
-    if(semIncrementar(semaforosMemoria, LIBRES) == -1)
-      banderaFinal = _verificarFinal("LIBRES");
-
-  }else{
-    semIncrementar(semaforosMemoria, OCUPADOS);
-
-    *rafagaCPU = QUANTUM;
-    siguiente->faltante -= *rafagaCPU;
-    (*tiempo) += *rafagaCPU;
-
-    *i = ((*i)+1)%(*n);
-  }
-
-  siguiente->numeroVidas--;
-
-  return banderaFinal;
 }
 
 void _insercion(Proceso *proceso){
@@ -177,6 +104,8 @@ void _siguiente(ProcesoE **siguiente){
 
 void recibir(Proceso *proceso){
   int *n ;
+  inicializarProductor(CAPACIDAD, TAMANO);
+
   if (proceso == NULL) {
     completarProduccion();
   } else {
@@ -191,53 +120,85 @@ void recibir(Proceso *proceso){
 void operar(Nodo *lista){
   int tiempo = 0;
   int *n, *i;
-  int banderaFinal = 0 ;
+  int terminado = 0;
   int contadorFinalizados = 0;
   int rafagaCPU = QUANTUM;
+  int quantumVariable = 0;
   ProcesoE *siguiente = NULL;
-  ProcesoE procesoAux;
+  ProcesoE procesoE;
+  typedef enum { Despachar, Finalizar } Accion;
+  Accion accion;
 
   // Apertura del semáforo y memoria
-  if ((semaforosMemoria = semget(KEY_SEMAFORO, 3, 0666 | IPC_CREAT)) < 0)
-    terminarProcesos("Error en la creacion del semáforo del productor-consumidor");
-  _aperturaMemoriaE(TAMANO);
+  inicializarConsumidor(CAPACIDAD, TAMANO);
 
   n = &memoria->n;
   i = &memoria->i;
   
-  while (1) {
-    if(semDecrementar(semaforosMemoria, OCUPADOS) == -1 )
-      banderaFinal = _verificarFinal("OCUPADOS");
+  while (!terminado){
+    terminado = decrementarOcupados(); 
 
-    // --  REGION CRITICA -- 
-    if(semDecrementar(semaforosMemoria, MUTEX) == -1)
-      banderaFinal = _verificarFinal("MUTEX");  
+    if(!terminado){
+      accederMemoriaCompartida({
+        // Obtencion de siguiente y verificacion de fin de epoca
+        _siguiente(&siguiente);
 
+        if(siguiente == NULL){
+          _restaurarVidas();
+          *i = 0;
+          siguiente = &memoria->procesos[*i];
+        }
 
-    // Obtencion de siguiente y verificacion de fin de epoca
-    _siguiente(&siguiente);
+        memcpy(&procesoE, siguiente, sizeof(ProcesoE));
+        quantumVariable = sqrt((6 - siguiente->proceso.prioridad) * 10);
 
-    if(siguiente == NULL){
-      _restaurarVidas();
-      siguiente = &memoria->procesos[0];
-      *i = 0;
+        if(siguiente->faltante <= quantumVariable){
+          // Verificar el tiempo
+          rafagaCPU = siguiente->faltante;
+
+          // Verificacion de compactacion
+          if( *i == (*n)-1)
+            *i = 0;
+          else
+            _compactar(memoria->procesos, *i, *n);
+
+          // Actualizar numero de procesos
+          (*n)--;
+          incrementarLibres();
+          accion = Finalizar;
+        }else{
+          incrementarOcupados();
+
+          // Ajuste de tiempo de proceso
+          rafagaCPU = quantumVariable;
+          siguiente->faltante -= rafagaCPU;
+          
+          // Ajuste de indice
+          *i = ((*i)+1)%(*n);
+          accion = Despachar;
+        } 
+
+        siguiente->numeroVidas--;
+      });
+    } else if (*n == 1){
+      // Ultimo proceso en memoria compartida
+      memcpy(&procesoE, siguiente, sizeof(ProcesoE));
+      rafagaCPU = procesoE.faltante;
+      accion  = Finalizar;
+    } else{
+      // Finalizo
+      break;
     }
 
-    banderaFinal = _ejecutarProceso(lista, siguiente, &tiempo, &rafagaCPU);
-    memcpy(&procesoAux, siguiente, sizeof(ProcesoE));
-
-    if(banderaFinal && *n <= 0)
-        break;
-
-    // -- FIN REGION CRITICA -- 
-    if(semIncrementar(semaforosMemoria, MUTEX) == -1)
-      banderaFinal = _verificarFinal("MUTEX");  
-    
-    // Invocar al despachador
-    colocar(&procesoAux.proceso, rafagaCPU);
+    switch (accion){
+      case Despachar:
+        colocar(&procesoE.proceso, rafagaCPU);
+      break;
+      case Finalizar:
+        procesoE.proceso.final = colocar(&procesoE.proceso, rafagaCPU);
+        agregar(lista, &procesoE.proceso);
+      break;
+    }
   }
-
-  // Retorna el tiempo total 
-  //return tiempo;
 }
 
