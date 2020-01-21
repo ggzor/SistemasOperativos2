@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define CAPACIDAD 10
+#define CAPACIDAD 15
 
 typedef struct Memoria {
   Proceso procesos[CAPACIDAD];
@@ -24,6 +24,13 @@ typedef struct Memoria {
 #define TAMANO sizeof(Memoria)
 
   /**
+   * Algoritmo de planificación Shortest Job First
+   * 
+   * Descripción del algoritmo.
+   *        - Los procesos ingresados seran ordenados en una cola conforme a su tiempo de ejecución total
+   *        - El procesamiento va ser por lotes, es decir, no existe un QUANTUM que delimite el tiempo que se le asignara a un proceso. El tiempo de CPU
+   *          de cada proceso es equivalente al tiempo de ejecución de dicho proceso.
+   * 
    * Funciones para algoritmo de planificación de procesos con politicas de Short Job First.
    * _insercionOrdenda. Funcion encarga de insertar un nuevo proceso en la memoria compartida de manera 
    *                  que se respete el orden. La función encargada de hacer la comparación entre procesos
@@ -40,7 +47,7 @@ void _insercionOrdenada(Proceso *proceso, Proceso *array, int total){
   int i = total;
 
   // Asignacion de lugar a nuevo proceso. Ordenado de Mayor a Menor
-  while(i > 0 &&  comparacionProcesos(&array[i-1], proceso) <= 0 )
+  while(i > 0 &&  comparacionProcesosT(&array[i-1], proceso) <= 0 )
     i--;
 
   // Desplazamiento a la derecha de los valores menores 

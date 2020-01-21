@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define CAPACIDAD 10
+#define CAPACIDAD 5
 #define QUANTUM 5
 #define MUTEX    0
 #define LIBRES   1
@@ -25,7 +25,7 @@
 #define KEY_SEMAFORO 0x12
 #define KEY_MEMORIA 0X13
 
-
+#define INTERACTIVO
 typedef struct ProcesoE{
   Proceso proceso;
   int faltante;
@@ -40,6 +40,12 @@ typedef struct Memoria {
 #define TAMANO sizeof(Memoria)
 
   /**
+   * Algoritmo de planificación: Round Robin.
+   * 
+   * Descripción del algoritmo.
+   *        - Los procesos seran ordenados en una cola de procesos entrantes
+   *        - El QUANTUM es un valor constante para todos los procesos con un valor de 5 
+   *              
    * Funciones para algoritmo de planificación de procesos con politicas de Short Job First.
    * _insercionOrdenda. Funcion encarga de insertar un nuevo proceso en la memoria compartida de manera 
    *                  que se respete el orden. La función encargada de hacer la comparación entre procesos
@@ -49,26 +55,11 @@ typedef struct Memoria {
    * Operar. Función encargada de recibir Procesos en la parte del Ejecutor. Los procesos son mandados por el Receptor a tráves 
    *          de la función recibir.
    *          Aplica las politicas de planificación para simular el algoritmo de planificación
+   * _compactar. Compacta los procesos en memoria compartida despues de la eliminación de un proceso
   **/
-
- extern int semaforosMemoria;
-
-void _aperturaMemoriaE(int tamano) {
-  int shmId;
-
-  // Apertura de memoria compartida
-  if ((shmId = shmget(KEY_MEMORIA, tamano, 0666 | IPC_CREAT)) < 0)
-    terminarProcesos("Error en la creación de la memoria compartida");
-
-  // Enlace con memoria compartida
-  if ((memoria = (struct Memoria *)shmat(shmId, 0, 0)) < 0)
-    terminarProcesos("Error al enlazar la memoria compartida");
-}
-
 
 void _insercion(Proceso *proceso, ProcesoE *array, int n){
   ProcesoE encapsulado;
-
   memcpy(&encapsulado.proceso, proceso, sizeof(Proceso));
   encapsulado.faltante = encapsulado.proceso.tiempo;
   memcpy(&array[n], &encapsulado, sizeof(ProcesoE));
@@ -81,20 +72,11 @@ void _compactar(ProcesoE *array, int i, int total){
     }
 }
 
-int _verificarFinal(const char *semaforo){
-  int banderaFinal = 0;
-  if(errno == EINVAL){
-    banderaFinal = 1;
-  }else {
-    char mensajeError[50];
-    sprintf(mensajeError,"Error en el semaforo de memoria: %s", semaforo);
-    exitError(mensajeError);
-  }
-  return banderaFinal;
-}
-
 void recibir(Proceso *proceso){
   int *n ;
+
+  inicializarProductor(CAPACIDAD, TAMANO);
+
   if (proceso == NULL) {
     completarProduccion();
   } else {
@@ -110,75 +92,74 @@ void operar(Nodo *lista){
   ProcesoE procesoE;
   int tiempo = 0;
   int *n, *i;
-  int banderaFinal = 0 ;
+  int terminado = 0;
   int contadorFinalizados = 0;
+  int banderaTerminar = 0;
   int rafagaCPU = QUANTUM;
-
+  typedef enum { Despachar, Finalizar } Accion;
+  Accion accion;
 
   // Apertura del semáforo y memoria
-  if ((semaforosMemoria = semget(KEY_SEMAFORO, 3, 0666 | IPC_CREAT)) < 0)
-    terminarProcesos("Error en la creacion del semáforo del productor-consumidor");
-  _aperturaMemoriaE(TAMANO);
+  printf("Inicializando consumidor\n");
+  inicializarConsumidor(CAPACIDAD, TAMANO);
 
   n = &memoria->n;
   i = &memoria->i;
-
   
-  while (1) {
+  while(!terminado) {
 
-    if(semDecrementar(semaforosMemoria, OCUPADOS) == -1 )
-      banderaFinal = _verificarFinal("OCUPADOS");
+    terminado = decrementarOcupados(); 
 
-    // --  REGION CRITICA -- 
-    if(semDecrementar(semaforosMemoria, MUTEX) == -1)
-      banderaFinal = _verificarFinal("MUTEX");  
-
-    // Verificacion de finalizacion de proceso
-    if(memoria->procesos[*i].faltante <= QUANTUM){
+    if(!terminado){
+      accederMemoriaCompartida({
+      // Verificacion de finalizacion de proceso
       memcpy(&procesoE, &memoria->procesos[*i], sizeof(ProcesoE));
 
-      // Verificar el tiempo
+        if(memoria->procesos[*i].faltante <= QUANTUM){
+          // Verificar el tiempo
+          rafagaCPU = procesoE.faltante;
+
+          // Verificacion de compactacion
+          if( *i == (*n)-1)
+            *i = 0;
+          else
+            _compactar(memoria->procesos, *i, *n);
+
+          // Actualizar numero de procesos
+          (*n)--;
+          incrementarLibres();
+          accion = Finalizar;
+        }else{
+          incrementarOcupados();
+
+          // Ajustes de tiempo de proceso
+          rafagaCPU = QUANTUM;
+          memoria->procesos[*i].faltante -= rafagaCPU;
+
+          // Ajuste de indice
+          *i = ((*i)+1)%(*n);
+          accion = Despachar;
+        }
+      });
+    }else if(*n == 1){
+      // Ultimo proceso en memoria compartida
+      memcpy(&procesoE, &memoria->procesos[0], sizeof(ProcesoE));
       rafagaCPU = procesoE.faltante;
-      tiempo+= rafagaCPU;
-      procesoE.proceso.final = tiempo;
-
-      // Agregar para estadísticas
-      agregar(lista, &procesoE.proceso);
-
-      // Verificacion de compactacion
-      if( *i == (*n)-1)
-        *i = 0;
-      else{
-        _compactar(memoria->procesos, *i, *n);
-      }
-
-      // Actualizar numero de procesos
-      (*n)--;
-      if(semIncrementar(semaforosMemoria, LIBRES) == -1)
-        banderaFinal = _verificarFinal("LIBRES");
-
+      accion = Finalizar;
     }else{
-      semIncrementar(semaforosMemoria, OCUPADOS);
-
-      rafagaCPU = QUANTUM;
-      memoria->procesos[*i].faltante -= rafagaCPU;
-      tiempo += rafagaCPU;
-
-      *i = ((*i)+1)%(*n);
+      break;
     }
 
-    if(banderaFinal && *n <= 0)
+    switch (accion){
+      case Despachar:
+        colocar(&procesoE.proceso, rafagaCPU);
       break;
+      case Finalizar:
+        procesoE.proceso.final = colocar(&procesoE.proceso, rafagaCPU);
+        agregar(lista, &procesoE.proceso);
+      break;
+    }
+  } 
 
-    // -- FIN REGION CRITICA -- 
-    if(semIncrementar(semaforosMemoria, MUTEX) == -1)
-      banderaFinal = _verificarFinal("MUTEX");  
-    
-    // Invocar al despachador
-    colocar(&procesoE.proceso, rafagaCPU);
-  }
-
-    // Retorna el tiempo total 
-    // return tiempo;
-   }
+}
 
