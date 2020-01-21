@@ -12,9 +12,12 @@
 
 #define RECEPTOR "/tmp/pipeReceptor"
 
-int main() {
+int main(int argc, char **argv) {
   int recepcion;
   Proceso proceso;
+
+  if (argc >= 2)
+    srand(atoi(argv[1]));
 
   recepcion = abrirPipeLectura(RECEPTOR);
 
