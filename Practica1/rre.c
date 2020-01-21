@@ -140,15 +140,15 @@ void operar(Nodo *lista){
 
     if(!terminado){
       accederMemoriaCompartida({
-        // Obtencion de siguiente y verificacion de fin de epoca
+        // Obtencion de siguiente y verificacion de fin de epoca. En caso de ser fin de epoca se restauran las vidas y se comienza desde el indice 0
         _siguiente(&siguiente);
-
         if(siguiente == NULL){
           _restaurarVidas();
           *i = 0;
           siguiente = &memoria->procesos[*i];
         }
 
+        // Auxiliare de proceso actual y determinacion de quantum confomre a su prioridad
         memcpy(&procesoE, siguiente, sizeof(ProcesoE));
         quantumVariable = sqrt((6 - siguiente->proceso.prioridad) * 10);
 
@@ -184,12 +184,15 @@ void operar(Nodo *lista){
       // Ultimo proceso en memoria compartida
       memcpy(&procesoE, siguiente, sizeof(ProcesoE));
       rafagaCPU = procesoE.faltante;
+
+      // Accion tomada para el proceso actual
       accion  = Finalizar;
     } else{
       // Finalizo
       break;
     }
 
+    printf("Siguiente proceso: ID: %3d - Faltante: %3d - Quantum: %d - Vidas: %2d - Prioridad: %d\n", procesoE.proceso.nombre, procesoE.faltante, quantumVariable, procesoE.numeroVidas, procesoE.proceso.prioridad);
     switch (accion){
       case Despachar:
         colocar(&procesoE.proceso, rafagaCPU);

@@ -100,7 +100,6 @@ void operar(Nodo *lista){
   Accion accion;
 
   // Apertura del semáforo y memoria
-  printf("Inicializando consumidor\n");
   inicializarConsumidor(CAPACIDAD, TAMANO);
 
   n = &memoria->n;
