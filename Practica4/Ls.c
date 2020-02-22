@@ -149,7 +149,10 @@ void mostrarArchivo(struct dirent *archivo, const char *rutaCompleta) {
   if (tipoArchivo == 'l') {
     readlink(rutaCompleta, archivoFuente, 100); 
     printf(" -> ");
-    printf("\e[32m");
+    if (access(archivoFuente, F_OK) != -1)
+      printf("\e[32m");
+    else
+      printf("\e[31m");
     printf("%s", archivoFuente);
     printf("\033[0m");
   }
