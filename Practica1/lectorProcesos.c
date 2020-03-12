@@ -35,10 +35,16 @@
 */
 
 int recoleccionProcesos(FILE * file, int numeroProcesos,Proceso *listaProcesos){
-  int procesosLeidos = 0;    
-  while(procesosLeidos < numeroProcesos && (fscanf(file, "%d %d %d", &listaProcesos[procesosLeidos].nombre,
+  int procesosLeidos = 0, i;
+  while(procesosLeidos < numeroProcesos && (fscanf(file, "%d %d %d %d", 
+                                                          &listaProcesos[procesosLeidos].nombre,
                                                           &listaProcesos[procesosLeidos].tiempo,
-                                                          &listaProcesos[procesosLeidos].prioridad)) > 0){
+                                                          &listaProcesos[procesosLeidos].prioridad,
+                                                          &listaProcesos[procesosLeidos].cantidadPag)) > 0){
+    for (i = 0; i < CADENA_REF_LEN; i++) {
+      fscanf(file, "%d", &listaProcesos[procesosLeidos].cadenaReferencias[i]);
+    }
+
     listaProcesos[procesosLeidos].inicio = vtime();
     fgetc(file);
     procesosLeidos++;
@@ -54,10 +60,15 @@ void determinarAleatorios(int *tiempoDormir, int *numeroProcesos){
 
 void envioProcesos(int pd, Proceso *listaProcesos, int numeroProcesos){
   size_t data_write = write(pd, listaProcesos, sizeof(Proceso)*numeroProcesos );
+
   #ifdef DEBUG
     printf("Numero de procesos enviados en la rafaga: %d\n", numeroProcesos);
     for(int i =0; i<numeroProcesos; i++)
-        printf("%d %d %d\n",listaProcesos[i].nombre,listaProcesos[i].tiempo,listaProcesos[i].prioridad);
+        printf("%d %d %d %d\n",
+               listaProcesos[i].nombre,
+               listaProcesos[i].tiempo,
+               listaProcesos[i].prioridad,
+               listaProcesos[i].cantidadPag);
   #endif
 
   if(data_write != sizeof(Proceso)*numeroProcesos)
@@ -87,7 +98,6 @@ int main(int argc, char **argv){
       terminarProcesos("Error en la apertura del archivo de procesos - ");
 
   pd = abrirPipeEscritura(RECEPTOR);
-
   do{
     determinarAleatorios(&tiempoDormir, &numeroProcesos);
     numeroProcesos = recoleccionProcesos(file, numeroProcesos, listaProcesos);
