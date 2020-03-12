@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "tipos.h"
 
 int main(int argc, char **argv) {
-  int i, cantidad, semilla;
-  int duracion, prioridad;
+  int i, j, cantidad, semilla, numero;
+  int duracion, prioridad, cantPags;
   
   if (argc < 2) {
     printf("Uso: ./generador <cantidad> [semilla=0]\n"
@@ -34,11 +35,20 @@ int main(int argc, char **argv) {
     // Se suma 1 porque el rango es inclusivo
     duracion  = 5 + (rand() % (200 - 5 + 1));
     prioridad = 1 + (rand() % (5   - 1 + 1));
+    cantPags  = 5 + (rand() % (15  - 5 + 1));
 
     // Poner saltos de línea a partir del segundo
     if (i >= 2)
       printf("\n");
 
-    printf("%d %d %d", i, duracion, prioridad);
+    printf("%d %d %d %d ", i, duracion, prioridad, cantPags);
+
+    for (j = 0; j < CADENA_REF_LEN; j++) {
+      numero = rand() % cantPags;
+      if (j >= 1)
+        printf(" ");
+
+      printf("%d", numero);
+    }
   }
 }
