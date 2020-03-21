@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 int abierto = 0, recepcion, notificacion;
-int colocar(Proceso *proceso, int tiempo) {
+int colocar(Proceso *proceso, int tiempo, Colocacion colocacion) {
   if (!abierto) {
     // Abrir canales de comunicación
     recepcion = abrirPipeEscritura(DESPACHADOR_RECEPCION);

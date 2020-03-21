@@ -13,7 +13,12 @@
  * Notas:
  *  - La llamada es bloqueante en el proceso que la llama.
  **/
-int colocar(Proceso *proceso, int tiempo);
+
+// Define las banderas que puede colocar el planificador para la administracion de memoria
+// del proceso
+typedef enum { Primera = 1, Normal = 2, Final = 4 } Colocacion;
+
+int colocar(Proceso *proceso, int tiempo, Colocacion colocacion);
 void terminarDespacho();
 
 #endif // __DESPACHADOR_H__

@@ -93,7 +93,7 @@ void operar(Nodo *lista) {
     });
 
     // Verificar el tiempo
-    proceso.final = colocar(&proceso, proceso.tiempo);
+    proceso.final = colocar(&proceso, proceso.tiempo, Primera | Normal | Final);
 
     // Agregar para estadísticas
     agregar(lista, &proceso);

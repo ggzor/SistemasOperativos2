@@ -59,7 +59,7 @@ void operar(Nodo *lista) {
     });
 
     // Despachar proceso
-    proceso.final = colocar(&proceso, proceso.tiempo);
+    proceso.final = colocar(&proceso, proceso.tiempo, Primera | Normal | Final);
 
     // Agregar para estadísticas
     agregar(lista, &proceso);
