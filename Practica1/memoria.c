@@ -12,15 +12,15 @@
 #define pipeRecepcion "/tmp/pipeEnvioMemoria"
 #define pipeEnvio     "/tmp/pipeRecepcionMemoria"
 
-int abierto = 0;
-int recepcion, envio;
+int memoriaAbierta = 0;
+int memoriaRecepcion, memoriaEnvio;
 
 void inicializar() {
-  if (!abierto) {
-    recepcion = abrirPipeLectura(pipeRecepcion);
-    envio = abrirPipeEscritura(pipeEnvio);
+  if (!memoriaAbierta) {
+    memoriaRecepcion = abrirPipeLectura(pipeRecepcion);
+    memoriaEnvio = abrirPipeEscritura(pipeEnvio);
 
-    abierto = 1;
+    memoriaAbierta = 1;
   }
 }
 
@@ -28,10 +28,10 @@ void enviarMensaje(int tipo, int pid, int pag) {
   int buffer[3] = { tipo, pid, pag };
 
   inicializar();
-  write(envio, buffer, 3 * sizeof(int));
+  write(memoriaEnvio, buffer, 3 * sizeof(int));
 
   // Esperar la ejecución de la llamada
-  read(recepcion, &pid, sizeof(int));
+  read(memoriaRecepcion, &pid, sizeof(int));
 }
 
 void alojar(int pid, int cantidadPaginas) {
@@ -50,9 +50,9 @@ void terminarMemoria() {
   // Notificar terminación del manejo de memoria
   enviarMensaje(TERMINAR, 0, 0);
 
-  if (abierto) {
-    close(recepcion);
-    close(envio);
+  if (memoriaAbierta) {
+    close(memoriaRecepcion);
+    close(memoriaEnvio);
   }
 }
 

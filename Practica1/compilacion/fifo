@@ -1,6 +1,6 @@
 #!/bin/sh
 
 gcc -o bin/fifo-corto fifo.c ejecutor.c pipes.c utilerias.c \
-    productorConsumidor.c semaforos.c listas.c despachador.c -Wall \
+    productorConsumidor.c semaforos.c listas.c despachador.c memoria.c -Wall \
 && gcc -o bin/fifo-largo fifo.c receptor.c pipes.c utilerias.c \
-    listas.c productorConsumidor.c semaforos.c despachador.c -Wall
+    listas.c productorConsumidor.c semaforos.c despachador.c memoria.c -Wall

@@ -17,6 +17,8 @@
 // Define las banderas que puede colocar el planificador para la administracion de memoria
 // del proceso
 typedef enum { Primera = 1, Normal = 2, Final = 4 } Colocacion;
+// La cantidad de referencias que se hacen por cada acceso al procesador
+#define VENTANA 4
 
 int colocar(Proceso *proceso, int tiempo, Colocacion colocacion);
 void terminarDespacho();

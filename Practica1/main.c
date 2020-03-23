@@ -1,10 +1,12 @@
 #include "productorConsumidor.h"
 #include "vtime.h"
 
+#include <fcntl.h>
 #include <getopt.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -12,6 +14,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+// Pipes para comunicacion por pipes
+#define pipeRecepcion "/tmp/pipeEnvioMemoria"
+#define pipeEnvio     "/tmp/pipeRecepcionMemoria"
 
 void imprimirUso() {
   printf("Uso: bin/main [-s semilla=0] [-t] <planificador> <lista-procesos>\n"
@@ -93,12 +99,19 @@ int main(int argc, char **argv) {
   // Limpieza de recursos dejados por ejecuciones anteriores
   limpiarRecursos();
   limpiarRecursosVTime();
+  // Comunicación via pipes
+  unlink(pipeEnvio);
+  unlink(pipeRecepcion);
 
   if (tiempoVirtualActivo == 0)
     printf("Usando tiempo real.\n");
 
   // Usar tiempo virtual si se requiere
   usarTiempoReal(tiempoVirtualActivo == 0);
+
+  // Crear pipes de comunicacion
+  mkfifo(pipeEnvio, 0666);
+  mkfifo(pipeRecepcion, 0666);
 
   // Ejecución de comandos
   snprintf(comando, MAX_LEN, "bin/lectorProcesos %s %d", lista, semilla);
@@ -112,6 +125,10 @@ int main(int argc, char **argv) {
   ejecutarComando(comando);
 
   snprintf(comando, MAX_LEN, "bin/despachador");
+  ejecutarComando(comando);
+
+  // Ejecutar administrador de memoria
+  snprintf(comando, MAX_LEN, "python3 ./memoria-lru.py");
   ejecutarComando(comando);
 
   // Esperar hijos

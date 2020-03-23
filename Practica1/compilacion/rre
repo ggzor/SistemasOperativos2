@@ -1,6 +1,6 @@
 #!/bin/sh
 
 gcc -o bin/rre-corto rre.c ejecutor.c pipes.c utilerias.c \
-    productorConsumidor.c semaforos.c listas.c despachador.c  -lm \
+    productorConsumidor.c semaforos.c listas.c despachador.c memoria.c -lm \
 && gcc -o bin/rre-largo rre.c receptor.c \
-    pipes.c utilerias.c listas.c productorConsumidor.c semaforos.c despachador.c -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm -lm
+    pipes.c utilerias.c listas.c productorConsumidor.c semaforos.c despachador.c memoria.c -lm
