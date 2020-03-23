@@ -20,7 +20,8 @@
 #define pipeEnvio     "/tmp/pipeRecepcionMemoria"
 
 void imprimirUso() {
-  printf("Uso: bin/main [-s semilla=0] [-t] <planificador> <lista-procesos>\n"
+  printf("Uso: bin/main [-s semilla=0] [-t] <planificador> <lista-procesos>"
+                                          " <numero-paginas> <numero-marcos>\n"
           "  Planificadores disponibles:\n"
           "    fifo: Planificador FIFO\n"
           "    sjf:  Trabajo más corto primero\n"
@@ -53,6 +54,7 @@ int main(int argc, char **argv) {
   char *lista;
   int semilla = 0;
   int tiempoVirtualActivo = 0;
+  int numero_paginas, numero_marcos;
 
   while ((op = getopt(argc, argv, ":s:t")) != -1) {
     switch (op)
@@ -76,7 +78,7 @@ int main(int argc, char **argv) {
 
   // Validar cantidad de argumentos
   argc -= optind;
-  if (argc != 2) {
+  if (argc != 4) {
     printf("ERROR: No se proporcionaron los argumentos necesarios.\n");
     imprimirUso();
   }
@@ -95,6 +97,9 @@ int main(int argc, char **argv) {
   }
 
   lista = argv[optind + 1];
+
+  numero_paginas = atoi(argv[optind + 2]);
+  numero_marcos  = atoi(argv[optind + 3]);
 
   // Limpieza de recursos dejados por ejecuciones anteriores
   limpiarRecursos();
@@ -128,7 +133,8 @@ int main(int argc, char **argv) {
   ejecutarComando(comando);
 
   // Ejecutar administrador de memoria
-  snprintf(comando, MAX_LEN, "python3 ./memoria-lru.py");
+  snprintf(comando, MAX_LEN, "python3 ./memoria-lru.py %s %d %d",
+            planificador, numero_paginas, numero_marcos);
   ejecutarComando(comando);
 
   // Esperar hijos
