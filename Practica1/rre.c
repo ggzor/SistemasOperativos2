@@ -201,7 +201,7 @@ void operar(Nodo *lista){
         esPrimeraVez = 0;
       break;
       case Finalizar:
-        procesoE.proceso.final = colocar(&procesoE.proceso, rafagaCPU, Normal | Finalizar);
+        procesoE.proceso.final = colocar(&procesoE.proceso, rafagaCPU, Normal | Final);
         agregar(lista, &procesoE.proceso);
       break;
     }

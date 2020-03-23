@@ -114,7 +114,7 @@ void operar(Nodo *lista) {
         esPrimeraVez = 0;
         break;
       case Finalizar:
-        proceso.final = colocar(&proceso, tiempoDespacho, Normal | Finalizar);
+        proceso.final = colocar(&proceso, tiempoDespacho, Normal | Final);
         agregar(lista, &proceso);
         break;
     }
