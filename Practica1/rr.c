@@ -95,7 +95,6 @@ void operar(Nodo *lista){
   int terminado = 0;
   int contadorFinalizados = 0;
   int banderaTerminar = 0;
-  int esPrimeraVez = 1;
   int rafagaCPU = QUANTUM;
   typedef enum { Despachar, Finalizar } Accion;
   Accion accion;
@@ -154,8 +153,7 @@ void operar(Nodo *lista){
 
     switch (accion){
       case Despachar:
-        colocar(&procesoE.proceso, rafagaCPU, Normal | (esPrimeraVez ? Primera : 0));
-        esPrimeraVez = 0;
+        colocar(&procesoE.proceso, rafagaCPU, Normal | (procesoE.proceso.conteo == 1 ? Primera : 0));
       break;
       case Finalizar:
         procesoE.proceso.final = colocar(&procesoE.proceso, rafagaCPU, Normal | Final);

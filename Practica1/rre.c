@@ -124,7 +124,6 @@ void operar(Nodo *lista){
   int contadorFinalizados = 0;
   int rafagaCPU = QUANTUM;
   int quantumVariable = 0;
-  int esPrimeraVez = 1;
   ProcesoE *siguiente = NULL;
   ProcesoE procesoE;
   typedef enum { Despachar, Finalizar } Accion;
@@ -197,8 +196,7 @@ void operar(Nodo *lista){
     printf("Siguiente proceso: ID: %3d - Faltante: %3d - Quantum: %d - Vidas: %2d - Prioridad: %d\n", procesoE.proceso.nombre, procesoE.faltante, quantumVariable, procesoE.numeroVidas, procesoE.proceso.prioridad);
     switch (accion){
       case Despachar:
-        colocar(&procesoE.proceso, rafagaCPU, Normal | (esPrimeraVez ? Primera : 0));
-        esPrimeraVez = 0;
+        colocar(&procesoE.proceso, rafagaCPU, Normal | (procesoE.proceso.conteo == 1 ? Primera : 0));
       break;
       case Finalizar:
         procesoE.proceso.final = colocar(&procesoE.proceso, rafagaCPU, Normal | Final);

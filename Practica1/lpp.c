@@ -70,7 +70,6 @@ void operar(Nodo *lista) {
   int *n;
   int i, j, tiempoDespacho;
   float ganador, suma;
-  int esPrimeraVez = 1;
 
   typedef enum { Despachar, Finalizar } Accion;
   Accion accion;
@@ -152,8 +151,7 @@ void operar(Nodo *lista) {
     switch (accion)
     {
       case Despachar:
-        colocar(&proceso, tiempoDespacho, Normal | (esPrimeraVez ? Primera : 0));
-        esPrimeraVez = 0;
+        colocar(&proceso, tiempoDespacho, Normal | (proceso.conteo == 1 ? Primera : 0));
         break;
       case Finalizar:
         proceso.final = colocar(&proceso, tiempoDespacho, Normal | Final);
