@@ -25,7 +25,7 @@ int colocar(Proceso *proceso, int tiempo, Colocacion colocacion) {
     for (i = 0; i < VENTANA; i++) {
       // Obtener la página siguiente a acceder
       pagina = ((proceso->conteo - 1) * VENTANA + i + CADENA_REF_LEN) % CADENA_REF_LEN;
-      acceder(proceso->nombre, pagina);
+      acceder(proceso->nombre, proceso->cadenaReferencias[pagina]);
     }
   }
   
