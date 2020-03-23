@@ -86,6 +86,7 @@ void operar(Nodo *lista) {
         n = &memoria->n;
         
         (*n)--;
+        memoria->procesos[*n].conteo += 1;
         memcpy(&proceso, &memoria->procesos[*n], sizeof(Proceso));
       } else {
         break;

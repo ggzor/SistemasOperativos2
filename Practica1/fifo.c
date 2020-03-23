@@ -48,6 +48,7 @@ void operar(Nodo *lista) {
         inicio = &memoria->inicio;
         n = &memoria->n;
 
+        memoria->procesos[*inicio].conteo += 1;
         memcpy(&proceso, &memoria->procesos[*inicio], sizeof(Proceso));
 
         // Incrementar variables de la cola circular

@@ -105,6 +105,7 @@ void operar(Nodo *lista) {
         printf("Boleto: %.2f, Ganador: %d\n", ganador, procesos[i].proceso.nombre);
 
         // Copiar proceso
+        procesos[i].proceso.conteo += 1;
         memcpy(&proceso, &procesos[i].proceso, sizeof(Proceso));
 
         // Si el proceso ya está por terminar
@@ -138,6 +139,7 @@ void operar(Nodo *lista) {
       });
     } else if (memoria->n == 1) {
       // Copiar último proceso para ser despachado
+      memoria->procesos[0].proceso.conteo += 1;
       memcpy(&proceso, &memoria->procesos[0].proceso, sizeof(Proceso));
       tiempoDespacho = memoria->procesos[0].restante;
 

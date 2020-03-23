@@ -70,6 +70,7 @@ void operar(Nodo *lista) {
         procesos = memoria->procesos;
 
         // Copiar proceso
+        procesos[0].proceso.conteo += 1;
         memcpy(&proceso, &procesos[0].proceso, sizeof(Proceso));
         // Solo se asignará un segundo de despacho ya que no es el último
         tiempoDespacho = 1;
@@ -96,6 +97,7 @@ void operar(Nodo *lista) {
       });
     } else if (memoria->n == 1) {
       // Copiar último proceso para ser despachado
+      memoria->procesos[0].proceso.conteo += 1;
       memcpy(&proceso, &memoria->procesos[0].proceso, sizeof(Proceso));
       tiempoDespacho = memoria->procesos[0].restante;
 

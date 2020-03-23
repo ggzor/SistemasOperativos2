@@ -113,6 +113,7 @@ void operar(Nodo *lista){
     if(!terminado){
       accederMemoriaCompartida({
       // Verificacion de finalizacion de proceso
+      memoria->procesos[*i].proceso.conteo += 1;
       memcpy(&procesoE, &memoria->procesos[*i], sizeof(ProcesoE));
 
         if(memoria->procesos[*i].faltante <= QUANTUM){
@@ -143,6 +144,7 @@ void operar(Nodo *lista){
       });
     }else if(*n == 1){
       // Ultimo proceso en memoria compartida
+      memoria->procesos[0].proceso.conteo += 1;
       memcpy(&procesoE, &memoria->procesos[0], sizeof(ProcesoE));
       rafagaCPU = procesoE.faltante;
       accion = Finalizar;

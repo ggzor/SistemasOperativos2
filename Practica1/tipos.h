@@ -12,6 +12,7 @@ typedef struct {
 
     int inicio;
     int final;
+    int conteo;
  } Proceso;
 
 #endif // __TIPOS_H__

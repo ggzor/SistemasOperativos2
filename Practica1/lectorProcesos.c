@@ -45,6 +45,7 @@ int recoleccionProcesos(FILE * file, int numeroProcesos,Proceso *listaProcesos){
       fscanf(file, "%d", &listaProcesos[procesosLeidos].cadenaReferencias[i]);
     }
 
+    listaProcesos[procesosLeidos].conteo = 0;
     listaProcesos[procesosLeidos].inicio = vtime();
     fgetc(file);
     procesosLeidos++;

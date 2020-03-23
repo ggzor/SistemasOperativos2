@@ -148,6 +148,7 @@ void operar(Nodo *lista){
           *i = 0;
           siguiente = &memoria->procesos[*i];
         }
+        siguiente->proceso.conteo += 1;
 
         // Auxiliare de proceso actual y determinacion de quantum confomre a su prioridad
         memcpy(&procesoE, siguiente, sizeof(ProcesoE));
