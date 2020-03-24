@@ -22,9 +22,9 @@ int colocar(Proceso *proceso, int tiempo, Colocacion colocacion) {
   }
 
   if (colocacion & Normal) {
-    for (i = 0; i < VENTANA; i++) {
+    for (i = 0; i < tiempo; i++) {
       // Obtener la página siguiente a acceder
-      pagina = ((proceso->conteo - 1) * VENTANA + i + CADENA_REF_LEN) % CADENA_REF_LEN;
+      pagina = (proceso->conteo + i - 1) % CADENA_REF_LEN;
       acceder(proceso->nombre, proceso->cadenaReferencias[pagina]);
     }
   }
