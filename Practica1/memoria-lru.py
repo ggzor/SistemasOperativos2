@@ -30,6 +30,9 @@ class LRU:
            recientemente utilizada"""
         entrada = self.pagina_lru()
 
+        print(f"{self.estadisticas['reemplazos']}. "
+              f"Reemplazando {entrada['pid']}[{entrada['indice']}]", flush=True)
+
         # Mover la página al disco
         entrada['posicion'] = 'disco'
         del self.marcos_paginas[(entrada['pid'], entrada['indice'])]
@@ -41,7 +44,7 @@ class LRU:
              True  si se pudo asignar la cantidad de páginas
                    solicitada
              False en caso contrario"""
-        #print(f'Alojando {pid} {nuevas_paginas}: {self.tabla_paginas}', flush=True)
+        print(f'Alojando {pid} {nuevas_paginas}: {self.tabla_paginas}', flush=True)
         if len(self.tabla_paginas) + nuevas_paginas > self.numero_paginas:
             return False
 
@@ -56,7 +59,7 @@ class LRU:
 
     def acceder(self, pid, pagina):
         """Simula el acceso a la pagina especificada del proceso dado"""
-        #print(f'Accediendo {pid}[{pagina}]', flush=True)
+        print(f'Accediendo {pid}[{pagina}] : {self.marcos_paginas}', flush=True)
         self.estadisticas['accesos'] += 1
         entrada = self.tabla_paginas[(pid, pagina)]
 
@@ -71,7 +74,7 @@ class LRU:
             # reemplazo de páginas
             if len(self.marcos_paginas) >= self.numero_marcos:
                 self.estadisticas['reemplazos'] += 1
-                reemplazar_pagina()
+                self.reemplazar_pagina()
 
             # Actualizar la posición de la página referenciada
             entrada['posicion'] = 'memoria'
@@ -81,13 +84,14 @@ class LRU:
     def desalojar(self, pid, cantidad_paginas):
         """Desaloja las páginas alojadas para el proceso con el
            pid especificado"""
-        #print(f'Desalojando {pid}: {self.tabla_paginas}', flush=True)
 
         for i in range(cantidad_paginas):
             entrada = self.tabla_paginas.pop((pid, i))
 
             if entrada['posicion'] == 'memoria':
                 del self.marcos_paginas[(pid, i)]
+
+        print(f'Desalojando {pid}: {self.marcos_paginas}', flush=True)
 
 
 import struct
