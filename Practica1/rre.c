@@ -193,13 +193,13 @@ void operar(Nodo *lista){
       break;
     }
 
-    printf("Siguiente proceso: ID: %3d - Faltante: %3d - Quantum: %d - Vidas: %2d - Prioridad: %d\n", procesoE.proceso.nombre, procesoE.faltante, quantumVariable, procesoE.numeroVidas, procesoE.proceso.prioridad);
+    printf("Siguiente proceso: ID: %3d - Faltante: %3d - Quantum: %d - Vidas: %2d - Prioridad: %d - Conteo: %d\n", procesoE.proceso.nombre, procesoE.faltante, quantumVariable, procesoE.numeroVidas, procesoE.proceso.prioridad, procesoE.proceso.conteo);
     switch (accion){
       case Despachar:
         colocar(&procesoE.proceso, rafagaCPU, Normal | (procesoE.proceso.conteo == 1 ? Primera : 0));
       break;
       case Finalizar:
-        procesoE.proceso.final = colocar(&procesoE.proceso, rafagaCPU, Normal | Final);
+        procesoE.proceso.final = colocar(&procesoE.proceso, rafagaCPU, Normal | Final | (procesoE.proceso.conteo == 1 ? Primera : 0));
         agregar(lista, &procesoE.proceso);
       break;
     }

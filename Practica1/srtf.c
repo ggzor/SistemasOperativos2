@@ -112,7 +112,7 @@ void operar(Nodo *lista) {
         colocar(&proceso, 1, Normal | (proceso.conteo == 1 ? Primera : 0));
         break;
       case Finalizar:
-        proceso.final = colocar(&proceso, tiempoDespacho, Normal | Final);
+        proceso.final = colocar(&proceso, tiempoDespacho, Normal | Final | (proceso.conteo == 1 ? Primera : 0));
         agregar(lista, &proceso);
         break;
     }
