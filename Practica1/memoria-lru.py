@@ -21,6 +21,9 @@ class LRU:
                 'fallos_pagina': 0,
                 'reemplazos': 0 }
 
+    def obtener_marcos(self):
+        return  '{ ' + ', '.join(f'{pid}[{pag}]' for pid,pag in self.marcos_paginas.keys()) + ' }'
+
     def pagina_lru(self):
         """Obtiene la entrada de la página menos recientemente utilizada"""
         return next(iter(self.marcos_paginas.values()))
@@ -44,7 +47,7 @@ class LRU:
              True  si se pudo asignar la cantidad de páginas
                    solicitada
              False en caso contrario"""
-        print(f'Alojando {pid} {nuevas_paginas}: {self.tabla_paginas}', flush=True)
+        print(f'Alojando {nuevas_paginas} paginas para proceso {pid}', flush=True)
         if len(self.tabla_paginas) + nuevas_paginas > self.numero_paginas:
             return False
 
@@ -59,7 +62,6 @@ class LRU:
 
     def acceder(self, pid, pagina):
         """Simula el acceso a la pagina especificada del proceso dado"""
-        print(f'Accediendo {pid}[{pagina}] : {self.marcos_paginas}', flush=True)
         self.estadisticas['accesos'] += 1
         entrada = self.tabla_paginas[(pid, pagina)]
 
@@ -81,6 +83,8 @@ class LRU:
             # Tabla de páginas invertida
             self.marcos_paginas[(pid, pagina)] = entrada
 
+        print(f'Accediendo a {pid}[{pagina}] - {self.obtener_marcos()}', flush=True)
+
     def desalojar(self, pid, cantidad_paginas):
         """Desaloja las páginas alojadas para el proceso con el
            pid especificado"""
@@ -91,7 +95,7 @@ class LRU:
             if entrada['posicion'] == 'memoria':
                 del self.marcos_paginas[(pid, i)]
 
-        print(f'Desalojando {pid}: {self.marcos_paginas}', flush=True)
+        print(f'Desalojando {pid} - {self.obtener_marcos()}', flush=True)
 
 
 import struct

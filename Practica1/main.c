@@ -133,7 +133,7 @@ int main(int argc, char **argv) {
   ejecutarComando(comando);
 
   // Ejecutar administrador de memoria
-  snprintf(comando, MAX_LEN, "python3 ./memoria-lru.py %s %d %d",
+  snprintf(comando, MAX_LEN, "python3 ./memoria-lru.py %s %d %d &> memoria-lru-registro.txt",
             planificador, numero_paginas, numero_marcos);
   ejecutarComando(comando);
 
