@@ -61,3 +61,8 @@ class ErrorConexion:
 @dataclass
 class SobrescrituraInvalida:
     nombre: str
+
+
+@dataclass
+class OperacionInvalida:
+    razon: str
