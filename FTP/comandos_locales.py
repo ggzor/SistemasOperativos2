@@ -19,7 +19,10 @@ async def ejecutar_comando(comando, config):
 
             for host, resultado in zip(destinos, resultados):
                 print(f"[{host}] ", end="")
-                imprimir_resultado(resultado, config)
+                if resultado == None:
+                    print("Completado exitosamente")
+                else:
+                    imprimir_resultado(resultado, config)
         else:
             return OperacionInvalida("Este comando no soporta múltiples direcciones")
 
@@ -27,51 +30,53 @@ async def ejecutar_comando(comando, config):
 async def conectar(host, puerto, comando, config):
     try:
         reader, writer = await asyncio.open_connection(host, puerto)
-        return await procesar_comando(comando, reader, writer, config)
+        return await procesar_comando(comando, reader, writer, host, config)
     except ConnectionRefusedError:
         return ErrorConexion(host)
 
 
 @singledispatch
-async def procesar_comando(comando, reader, writer, config):
+async def procesar_comando(comando, reader, writer, host, config):
     await comunicacion_async.send_packet(writer, comando)
     return await comunicacion_async.recv_packet(reader)
 
 
 @procesar_comando.register
-async def _(comando: Descargar, reader, writer, config):
+async def _(comando: Descargar, reader, writer, host, config):
     await comunicacion_async.send_packet(writer, comando)
     respuesta = await comunicacion_async.recv_packet(reader)
 
     if isinstance(respuesta, Continuar):
         print(
-            f"Descargando archivo {respuesta.datos.nombre} ({respuesta.datos.tamano} bytes)..."
+            f"Descargando archivo {respuesta.datos.nombre} ({respuesta.datos.tamano} bytes)"
+            f" desde {host}"
         )
 
         archivo = Path(config["directorio"], respuesta.datos.nombre)
         with open(str(archivo), "wb") as f:
             f.write(await reader.readexactly(respuesta.datos.tamano))
 
-        print("Archivo descargado.")
+        print(f"Descarga completa desde {host}")
     else:
         return respuesta
 
 
 @procesar_comando.register
-async def _(comando: Subir, reader, writer, config):
+async def _(comando: Subir, reader, writer, host, config):
     await comunicacion_async.send_packet(writer, comando)
     respuesta = await comunicacion_async.recv_packet(reader)
 
     if isinstance(respuesta, Continuar):
         print(
-            f"Subiendo archivo {comando.archivo.nombre} ({comando.archivo.tamano} bytes)..."
+            f"Subiendo archivo {comando.archivo.nombre} ({comando.archivo.tamano} bytes)"
+            f" a {host}"
         )
 
         archivo = Path(config["directorio"], comando.archivo.nombre)
         with open(archivo, "rb") as f:
             writer.write(f.read())
             await writer.drain()
-        print("Archivo subido.")
+        print(f"Carga completa a {host}")
     else:
         return respuesta
 
