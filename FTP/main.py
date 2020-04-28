@@ -3,9 +3,10 @@ import threading
 from functools import singledispatch
 
 import comunicacion_async
-from comandos import *
+from comandos_remotos import ejecutar_remoto
 from lectura_comandos import (ComandoInvalido, ComandoSalir, leer_comando,
                               leer_configuracion)
+from tipos import *
 
 
 async def ejecutar_servidor(config):

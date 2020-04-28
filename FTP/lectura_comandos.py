@@ -3,7 +3,7 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
-from comandos import Descargar, InfoArchivo, Listar, Subir
+from tipos import *
 
 
 @dataclass
