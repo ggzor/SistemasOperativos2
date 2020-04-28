@@ -72,7 +72,7 @@ async def _(comando: Subir, reader, writer, host, config):
             f" a {host}"
         )
 
-        archivo = Path(config["directorio"], comando.archivo.nombre)
+        archivo = Path(comando.archivo.nombre)
         with open(archivo, "rb") as f:
             writer.write(f.read())
             await writer.drain()
