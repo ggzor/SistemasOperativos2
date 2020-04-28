@@ -86,6 +86,11 @@ def leer_comando(comando, config):
         if len(destinos) != 1:
             return ComandoInvalido("Aún no se permite descargar de múltiples fuentes")
 
+        if Path(config["directorio"], parametros[1]).exists():
+            return ComandoInvalido(
+                f"El archivo '{parametros[1]}' ya existe en el directorio"
+            )
+
         comando = Descargar(parametros[1])
     elif nombre == "subir":
         if len(parametros) not in [2, 3]:
