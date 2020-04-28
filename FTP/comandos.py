@@ -135,7 +135,7 @@ async def _(comando: Subir, reader, writer, config):
         except PermissionError:
             respuesta = NoAccesible(comando.archivo.nombre)
     else:
-        respuesta = SobrescrituraInvalida(comando.archivo)
+        respuesta = SobrescrituraInvalida(comando.archivo.nombre)
 
     # Enviar respuesta
     await comunicacion_async.send_packet(writer, respuesta)

@@ -60,7 +60,7 @@ async def _(comando: Subir, reader, writer):
 
     if isinstance(respuesta, Continuar):
         print(
-            f"Subiendo archivo {comando.archivo.nombre} ({respuesta.datos.tamano} bytes)..."
+            f"Subiendo archivo {comando.archivo.nombre} ({comando.archivo.tamano} bytes)..."
         )
         with open(comando.archivo.nombre, "rb") as f:
             writer.write(f.read())
