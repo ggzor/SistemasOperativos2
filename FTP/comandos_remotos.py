@@ -65,7 +65,7 @@ async def _(comando: Descargar, reader, writer, config):
 @ejecutar_remoto.register
 async def _(comando: Subir, reader, writer, config):
     """Comando remoto para subir un archivo"""
-    archivo_destino = os.path.join(config["directorio"], comando.archivo.nombre)
+    archivo_destino = comando.archivo.nombre
 
     if not os.path.exists(archivo_destino) or comando.sobrescribir:
         try:
