@@ -27,8 +27,11 @@ def preparar_servidor(config):
 
 async def ejecutar_comando(comando, config):
     destinos, comando = comando
-    reader, writer = await asyncio.open_connection(destinos[0], config["port"])
-    return await procesar_comando(comando, reader, writer)
+    try:
+        reader, writer = await asyncio.open_connection(destinos[0], config["port"])
+        return await procesar_comando(comando, reader, writer)
+    except ConnectionRefusedError:
+        return ErrorConexion(destinos[0])
 
 
 @singledispatch
