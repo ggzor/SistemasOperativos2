@@ -101,7 +101,7 @@ async def _(comando: Descargar, reader, writer, config):
                     )
 
                     # Enviar mensaje de aceptacion
-                    respuesta_aceptacion = Continuar(comando, info_archivo)
+                    respuesta_aceptacion = Continuar(comando, datos=info_archivo)
                     await comunicacion_async.send_packet(writer, respuesta_aceptacion)
                     # Enviar contenido de archivo
                     writer.write(file.read())
