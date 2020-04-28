@@ -14,7 +14,7 @@ async def ejecutar_comando(comando, config):
     elif len(destinos) > 1:
         if isinstance(comando, Subir):
             resultados = await asyncio.gather(
-                [conectar(h, config["port"], comando, config) for h in destinos]
+                *[conectar(h, config["port"], comando, config) for h in destinos]
             )
 
             for host, resultado in zip(destinos, resultados):
@@ -31,7 +31,7 @@ async def conectar(host, puerto, comando, config):
     try:
         reader, writer = await asyncio.open_connection(host, puerto)
         return await procesar_comando(comando, reader, writer, host, config)
-    except ConnectionRefusedError:
+    except (ConnectionRefusedError, OSError):
         return ErrorConexion(host)
 
 
