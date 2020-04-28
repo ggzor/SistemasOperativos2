@@ -102,10 +102,10 @@ async def _(comando: Descargar, reader, writer, config):
 
                     # Enviar mensaje de aceptacion
                     respuesta_aceptacion = Continuar(comando, info_archivo)
-                    await comunicacion_async.send_packet(conexion, respuesta_aceptacion)
+                    await comunicacion_async.send_packet(writer, respuesta_aceptacion)
                     # Enviar contenido de archivo
-                    conexion.write(file.read())
-                    await conexion.drain()
+                    writer.write(file.read())
+                    await writer.drain()
                     return
             except PermissionError:
                 respuesta = NoAccesible(comando.ruta)
@@ -115,7 +115,7 @@ async def _(comando: Descargar, reader, writer, config):
         respuesta = NoEncontrado(comando.ruta)
 
     # Enviar respuesta
-    await comunicacion_async.send_packet(conexion, respuesta)
+    await comunicacion_async.send_packet(writer, respuesta)
 
 
 @ejecutar_remoto.register
