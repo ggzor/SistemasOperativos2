@@ -44,7 +44,7 @@ async def _(comando: Descargar, reader, writer):
 
     if isinstance(respuesta, Continuar):
         print(
-            "Descargando archivo {respuesta.datos.nombre} ({respuesta.datos.tamano} bytes)..."
+            f"Descargando archivo {respuesta.datos.nombre} ({respuesta.datos.tamano} bytes)..."
         )
         with open(respuesta.datos.nombre, "wb") as f:
             f.write(await reader.readexactly(respuesta.datos.tamano))
