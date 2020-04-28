@@ -1,6 +1,7 @@
 import asyncio
 import os
 from functools import singledispatch
+from pathlib import Path
 
 import comunicacion_async
 from tipos import *
@@ -15,10 +16,15 @@ async def ejecutar_remoto(comando, reader, writer, config):
 @ejecutar_remoto.register
 async def _(comando: Listar, reader, writer, config):
     """Comando remoto para listar los archivos que se encuentran en el directorio de trabajo"""
+
+    directorio = Path(config["directorio"])
+
     info_archivos = [
-        InfoArchivo(f, os.path.getsize(os.path.join(config["directorio"], f)))
-        for f in os.listdir(config["directorio"])
+        InfoArchivo(f.name, f.stat().st_size)
+        for f in directorio.iterdir()
+        if f.is_file()
     ]
+
     respuesta = ListaArchivos(info_archivos)
     await comunicacion_async.send_packet(writer, respuesta)
 
