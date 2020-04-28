@@ -40,7 +40,7 @@ async def procesar_comando(comando, reader, writer):
 @procesar_comando.register
 async def _(comando: Descargar, reader, writer):
     await comunicacion_async.send_packet(writer, comando)
-    respuesta = comunicacion_async.recv_packet(reader)
+    respuesta = await comunicacion_async.recv_packet(reader)
 
     if isinstance(respuesta, Continuar):
         print(
