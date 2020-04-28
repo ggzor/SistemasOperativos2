@@ -128,9 +128,9 @@ async def _(comando: Subir, reader, writer, config):
             with open(archivo_destino, "wb") as archivo:
                 # Enviar mensaje de aceptacion
                 respuesta_aceptacion = Continuar(comando, None)
-                await comunicacion_async.send_packet(conexion, respuesta_aceptacion)
+                await comunicacion_async.send_packet(writer, respuesta_aceptacion)
                 # Recibir contenido de archivo a escribir
-                archivo.write(await conexion.readexactly(comando.archivo.tamano))
+                archivo.write(await reader.readexactly(comando.archivo.tamano))
                 return
         except PermissionError:
             respuesta = NoAccesible(comando.archivo.nombre)
@@ -138,4 +138,4 @@ async def _(comando: Subir, reader, writer, config):
         respuesta = SobrescrituraInvalida(comando.archivo)
 
     # Enviar respuesta
-    await comunicacion_async.send_packet(conexion, respuesta)
+    await comunicacion_async.send_packet(writer, respuesta)

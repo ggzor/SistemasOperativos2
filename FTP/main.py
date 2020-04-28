@@ -53,6 +53,23 @@ async def _(comando: Descargar, reader, writer):
         return respuesta
 
 
+@procesar_comando.register
+async def _(comando: Subir, reader, writer):
+    await comunicacion_async.send_packet(writer, comando)
+    respuesta = await comunicacion_async.recv_packet(reader)
+
+    if isinstance(respuesta, Continuar):
+        print(
+            f"Subiendo archivo {comando.archivo.nombre} ({respuesta.datos.tamano} bytes)..."
+        )
+        with open(comando.archivo.nombre, "rb") as f:
+            writer.write(f.read())
+            await writer.drain()
+        print("Archivo subido.")
+    else:
+        return respuesta
+
+
 async def evaluar(comando, config):
     comando = leer_comando(comando, config)
 
