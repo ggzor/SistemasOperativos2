@@ -15,6 +15,7 @@ class PositionAssigned:
 @dataclass
 class Node:
     name: str
+    position: int
     address: str
     replicatedBy: Optional[str]
     replicating: List[str]
@@ -27,7 +28,10 @@ class Topology:
 
 def calculate_topology(state: State) -> Topology:
     return Topology(
-        [Node(c.name, c.address, c.replicatedBy, c.replicating) for c in state.clients]
+        [
+            Node(c.name, c.position, c.address, c.replicatedBy, c.replicating)
+            for c in state.clients
+        ]
     )
 
 
@@ -84,7 +88,9 @@ class RegisterNewClient:
                 # Buscar el primer cliente, prefiriendo los conectados
                 follower: Client = sorted(
                     state.clients,
-                    key=lambda c: ["online", "pending", "offline"].index(c.state),
+                    key=lambda c: ["online", "pending", "replica", "offline"].index(
+                        c.state
+                    ),
                 )[0]
 
                 follower.follow(client)

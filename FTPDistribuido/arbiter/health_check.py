@@ -1,5 +1,5 @@
 from .actions import NodeStatus, Statuses, get_statuses
-from .state import Client
+from .state import Client, State
 
 from asyncServer import Response, server
 from utils import readObject, writeObject
@@ -47,12 +47,21 @@ async def ask_service(client: Client, timeout):
     return NodeStatus(client.name, "offline")
 
 
-async def health_checker(state, topologyUpdate, interval, timeout):
+async def health_checker(state: State, topologyUpdate, interval, timeout):
     prevTask = None
     while True:
         result = Statuses(
             await asyncio.gather(*map(lambda c: ask_service(c, timeout), state.clients))
         )
+
+        # Revisar replicador
+        for clientStatus in result.statuses:
+            if clientStatus.state == "offline":
+                client = state.find_client(clientStatus.name)
+                if client.replicatedBy is not None:
+                    replica = state.find_client(client.replicatedBy)
+                    if replica.state == "online":
+                        clientStatus.state = "replica"
 
         if result != get_statuses(state):
             yield result
