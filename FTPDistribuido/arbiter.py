@@ -92,7 +92,6 @@ if __name__ == "__main__":
     config = args.parse_args()
 
     logging.basicConfig(filename="arbiter.log", filemode="w", level=logging.DEBUG)
-    print(config.logging)
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main(config))

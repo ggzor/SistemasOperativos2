@@ -4,15 +4,16 @@ import logging
 import pprint
 
 actorLogger = logging.getLogger("Actor")
+pp = pprint.PrettyPrinter(indent=2, width=88)
 
 
 async def runActor(sources, initialState, processMessage, runAction, commit):
     state = initialState
-    actorLogger.debug(f"Initial State:\n{pprint.pformat(state)}")
+    actorLogger.debug(f"Initial State:\n{pp.pformat(state)}")
 
     async with merge(*sources).stream() as stream:
         async for message in stream:
-            actorLogger.debug(f"Message Received: {pprint.pformat(message)}")
+            actorLogger.debug(f"Message Received: \n{pp.pformat(message)}")
             actions = processMessage(message, state)
 
             actions, postActions = [
@@ -21,19 +22,19 @@ async def runActor(sources, initialState, processMessage, runAction, commit):
 
             if actions == postActions == []:
                 actorLogger.warning(
-                    f"No actions for message:\n{pprint.pformat(message)}"
-                    + f"\nState: {pprint.pformat(state)}"
+                    f"No actions for message:\n{pp.pformat(message)}"
+                    + f"\nState: {pp.pformat(state)}"
                 )
                 continue
 
-            actorLogger.debug(f"Actions:\n{pprint.pformat(actions)}")
-            actorLogger.debug(f"Post-actions:\n{pprint.pformat(postActions)}")
+            actorLogger.debug(f"Actions:\n{pp.pformat(actions)}")
+            actorLogger.debug(f"Post-actions:\n{pp.pformat(postActions)}")
 
             runActions(runAction, actions, state, message)
             commit(state)
             runActions(runAction, postActions, state, message)
 
-            actorLogger.debug(f"After commit:\n{pprint.pformat(state)}")
+            actorLogger.debug(f"After commit:\n{pp.pformat(state)}")
 
 
 def runActions(runAction, actions, state, message):
@@ -45,6 +46,6 @@ def runActions(runAction, actions, state, message):
             if not isinstance(newActions, list):
                 newActions = [newActions]
 
-            actorLogger.debug(f"New actions generated:\n{pprint.pformat(newActions)}")
+            actorLogger.debug(f"New actions generated:\n{pp.pformat(newActions)}")
 
             actions.extend(newActions)
