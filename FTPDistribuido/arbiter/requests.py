@@ -15,6 +15,7 @@ def processRequest(request, state: State, fullRequest: Request):
 @dataclass
 class Register:
     name: str
+    requestsPort: int
     healthCheck: int = 4321
 
 
@@ -24,7 +25,7 @@ def _(request: Register, state: State, fullRequest: Request):
 
     if request.name not in names:
         return (
-            RegisterNewClient(request.name, request.healthCheck),
+            RegisterNewClient(request.name, request.requestsPort, request.healthCheck),
             StreamClient(request.name),
         )
     else:

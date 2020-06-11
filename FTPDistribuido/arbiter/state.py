@@ -13,6 +13,7 @@ class Client:
     position: int
     name: str
     address: str
+    requestsPort: int
     state: str
     replicating: List[str]
     replicatedBy: Optional[str]
