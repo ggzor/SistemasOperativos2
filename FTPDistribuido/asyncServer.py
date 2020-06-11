@@ -7,7 +7,7 @@ import logging
 import traceback
 
 from dataclasses import dataclass
-from typing import Any, AsyncIterable, Callable, Union
+from typing import Any, AsyncIterable, Callable, Union, Optional
 
 ## Tipos para las respuestas
 
@@ -15,6 +15,14 @@ from typing import Any, AsyncIterable, Callable, Union
 @dataclass
 class Response:
     response: Any
+
+
+# Un objeto como respuesta que requiere confirmación
+@dataclass
+class ResponseWithAck:
+    id: str
+    response: Any
+    timeout: Optional[float]
 
 
 # Un flujo que no espera confirmacion
@@ -40,7 +48,12 @@ class Request:
 ## Tipo para las confirmaciones
 @dataclass
 class Ack:
-    pass
+    id: str = None
+
+
+@dataclass
+class Nack:
+    id: str = None
 
 
 asyncServerLogger = logging.getLogger("asyncServer")
@@ -62,6 +75,25 @@ async def server(port, ignore_failures=False):
 
                 if isinstance(response, Response):
                     await writeObject(writer, response.response)
+                elif isinstance(response, ResponseWithAck):
+                    try:
+
+                        async def operation():
+                            await writeObject(writer, response.response)
+                            return await readObject(reader)
+
+                        if response.timeout is None:
+                            answer = await operation()
+                        else:
+                            answer = await asyncio.wait_for(
+                                operation(), response.timeout
+                            )
+                        writer.close()
+
+                        if isinstance(answer, Ack):
+                            queue.put_nowait(Ack(response.id))
+                    except:
+                        queue.put_nowait(Nack(response.id))
                 elif isinstance(response, Stream):
                     async for item in response.stream:
                         await writeObject(writer, item)
