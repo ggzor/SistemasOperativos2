@@ -1,0 +1,24 @@
+@import "./Roboto.scss";
+@import "./Theme.scss";
+
+*,
+*::after,
+*::before {
+  position: relative;
+  box-sizing: border-box;
+  font-family: Roboto;
+}
+
+body {
+  margin: 0;
+}
+
+h2 {
+  margin: 0;
+  font-style: normal;
+  font-weight: 300;
+  font-size: 24px;
+  line-height: 28px;
+
+  color: rgba(0, 0, 0, 0.7);
+}
