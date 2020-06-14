@@ -30,7 +30,7 @@ export const ComputerCard = ({
   onEvent,
 }) => {
   const canReceive = true
-  const [selectedTab, setSelectedTab] = useState("informacion")
+  const [selectedTab, setSelectedTab] = useState("archivos")
   const [selectedFiles, setSelectedFiles] = useState(["abcd", "cdef"])
 
   const flatFS = flattenFileSystem(fileSystem)
@@ -194,11 +194,11 @@ function formatByteSize(size) {
 }
 
 const ComputerCardLayout = styled.article`
-  width: 300px;
-  height: 400px;
+  width: 280px;
+  height: 380px;
 
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
 
   background-color: white;
   box-shadow: 1px 10px 20px rgba(0, 0, 0, 0.1), 0px 5px 8px rgba(0, 0, 0, 0.15);
@@ -208,18 +208,15 @@ const ComputerCardLayout = styled.article`
 const InnerContent = styled.section`
   display: flex;
   flex-direction: column;
-
-  & > :nth-child(2) {
-    align-self: flex-start;
-  }
+  overflow: hidden;
 
   & > *:last-child {
     flex-grow: 1;
   }
 
   flex-grow: 1;
-  padding: 20px;
-  margin-top: 8px;
+  padding: 16px;
+  margin-top: 0px;
 `
 
 const TopBar = styled.div`
@@ -243,6 +240,7 @@ const Header = styled.section`
 const Chip = styled.span`
   visibility: ${({ visible }) => boolToVisibility(visible)};
 
+  align-self: flex-start;
   border-radius: 10px;
   padding: 4px 8px;
   text-transform: uppercase;
@@ -273,7 +271,7 @@ const BottomTabButtonLayout = styled.div`
   flex-direction: column;
   align-items: center;
 
-  padding: 8px;
+  padding: 4px;
 
   font-weight: 300;
   font-size: 10px;
@@ -361,13 +359,14 @@ const InfoDetail = ({ icon, iconColor, children }) => {
 
 const FileSystemLayout = styled.section`
   display: flex;
-  margin-top: 24px;
+  margin-top: 8px;
   flex-direction: column;
+  overflow: auto;
 `
 
 const FileItemLayout = styled.article`
   display: grid;
-  grid-template-rows: 32px;
+  grid-template-rows: 24px;
   grid-template-columns: 16px auto 1fr auto;
   column-gap: 8px;
   align-items: center;
@@ -397,9 +396,9 @@ const FileItem = ({ depth, selected, name, type }) => {
         style={{
           display: "inline-block",
           color: "rgba(0, 0, 0, 0.7)",
-          fontSize: "18px",
+          fontSize: "16px",
           fontWeight: "lighter",
-          marginTop: "2px",
+          marginTop: "4px",
           marginLeft: "8px",
           userSelect: "none",
         }}

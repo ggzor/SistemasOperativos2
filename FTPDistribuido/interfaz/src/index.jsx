@@ -14,7 +14,56 @@ window.receive = function (message) {
 
 const App = ({}) => {
   const [state, setState] = useState({
-    phase: "initial",
+    phase: "running",
+    computers: [
+      {
+        name: "Computadora 1",
+        fileSystem: {
+          type: "directory",
+          name: "files/folder1",
+          size: 0,
+          files: [
+            { type: "file", name: "archivo1.txt", size: 0 },
+            { type: "file", name: "archivo2.txt", size: 0 },
+            { type: "file", name: "archivo3.txt", size: 0 },
+            {
+              type: "directory",
+              name: "folder1.1",
+              size: 0,
+              files: [
+                { type: "file", name: "archivo4.txt", size: 0 },
+                { type: "file", name: "archivo5.txt", size: 0 },
+                { type: "file", name: "archivo6.txt", size: 0 },
+              ],
+            },
+          ],
+        },
+        info: {
+          isLocal: true,
+          status: "online",
+          replica: "Computadora 2",
+          syncState: { state: "synced" },
+          fileCount: 6,
+          totalFileSize: 0,
+          sentFiles: null,
+          receivedFiles: null,
+        },
+      },
+      {
+        name: "Computadora 2",
+        fileSystem: null,
+        info: {
+          isLocal: false,
+          status: "replica",
+          replica: "Computadora 1",
+          syncState: { state: "synced" },
+          fileCount: null,
+          totalFileSize: null,
+          sentFiles: null,
+          receivedFiles: null,
+        },
+      },
+    ],
   })
 
   useEffect(() => {
@@ -25,8 +74,6 @@ const App = ({}) => {
   const handleEvent = (event) => {
     console.log(JSON.stringify({ type: "message", message: event }))
   }
-
-  console.log(JSON.stringify(state))
 
   return (
     <AppLayout {...state}>
