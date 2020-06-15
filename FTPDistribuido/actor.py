@@ -21,7 +21,7 @@ async def runActor(sources, initialState, processMessage, runAction, commit):
             ]
 
             if actions == postActions == []:
-                actorLogger.warning(
+                actorLogger.info(
                     f"No actions for message:\n{pp.pformat(message)}"
                     + f"\nState: {pp.pformat(state)}"
                 )

@@ -28,6 +28,7 @@ class Page(QWebEnginePage):
                 raise ValueError
         except:
             logger.info(f"{'/'.join(src.split('/')[-2:])}:{line} - {message}")
+            print(f"{'/'.join(src.split('/')[-2:])}:{line} - {message}")
 
     async def javaScriptMessages(self):
         while True:
