@@ -18,6 +18,7 @@ class Node:
     position: int
     address: str
     requestsPort: int
+    folder: str
     replicatedBy: Optional[str]
     replicating: List[str]
 
@@ -35,6 +36,7 @@ def calculate_topology(state: State) -> Topology:
                 c.position,
                 c.address,
                 c.requestsPort,
+                c.folder,
                 c.replicatedBy,
                 c.replicating,
             )
@@ -62,6 +64,7 @@ def get_statuses(state: State) -> Statuses:
 class RegisterNewClient:
     name: str
     requestsPort: int
+    folder: str
     healthCheckPort: int
 
     def run(self, state: State, req: Request, config):
@@ -72,6 +75,7 @@ class RegisterNewClient:
             self.name,
             req.address,
             self.requestsPort,
+            self.folder,
             "pending",
             [],
             None,

@@ -14,6 +14,7 @@ class Client:
     name: str
     address: str
     requestsPort: int
+    folder: str
     state: str
     replicating: List[str]
     replicatedBy: Optional[str]
