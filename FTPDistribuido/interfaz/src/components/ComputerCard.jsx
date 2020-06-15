@@ -13,6 +13,9 @@ import {
   FileDirectory,
   File,
   IssueReopened,
+  LineArrowUp,
+  LineArrowDown,
+  Trashcan,
 } from "@primer/octicons-react"
 import { boolToVisibility } from "./utils"
 
@@ -25,13 +28,15 @@ import { LoadingIndicator } from "./LoadingIndicator"
 
 export const ComputerCard = ({
   name,
+  hash,
   info: { isLocal, ...info },
+  selection,
+  globalSelection,
   fileSystem,
   onEvent,
 }) => {
   const canReceive = true
   const [selectedTab, setSelectedTab] = useState("archivos")
-  const [selectedFiles, setSelectedFiles] = useState(["abcd", "cdef"])
 
   const flatFS = flattenFileSystem(fileSystem)
 
@@ -43,8 +48,11 @@ export const ComputerCard = ({
           <h2>{name}</h2>
           {canReceive && (
             <IconButton
+              disabled={selection.length > 0 || globalSelection.length === 0}
               icon={DesktopDownload}
-              onClick={() => onEvent && onEvent({ type: "receive", name })}
+              onClick={() =>
+                onEvent && onEvent({ type: "receive", computer: hash })
+              }
             >
               Recibir
             </IconButton>
@@ -57,8 +65,13 @@ export const ComputerCard = ({
               {flatFS.map(([depth, file]) => (
                 <FileItem
                   depth={depth}
-                  selected={selectedFiles.indexOf(file.hash) >= 0}
+                  selected={selection.indexOf(file.hash) >= 0}
                   key={file.hash}
+                  onClick={() =>
+                    onEvent &&
+                    file.state !== "deleting" &&
+                    onEvent({ type: "click", computer: hash, file })
+                  }
                   {...file}
                 />
               ))}
@@ -373,22 +386,40 @@ const FileItemLayout = styled.article`
 
   margin-left: ${({ depth }) => `${depth * 12}px;`};
 
-  &:hover[data-selected="false"] {
+  &:hover[data-selected="false"][data-deleting="false"] {
     background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  &[data-deleting="true"] {
+    opacity: 0.6;
   }
 
   &[data-selected="true"] {
     background-color: rgba(0, 0, 0, 0.07);
   }
 `
-const FileItem = ({ depth, selected, name, type }) => {
+const FileItem = ({
+  depth,
+  selected,
+  name,
+  uploading,
+  size,
+  type,
+  state,
+  ...props
+}) => {
   return (
-    <FileItemLayout {...{ depth }} data-selected={selected}>
+    <FileItemLayout
+      {...{ depth }}
+      data-selected={selected}
+      data-deleting={state === "deleting"}
+      {...props}
+    >
       <IconShell
         size="small"
         icon={type === "directory" ? FileDirectory : File}
         style={{
-          color: Colors.primary,
+          color: state === "deleting" ? Colors.fail : Colors.primary,
           marginLeft: "8px",
         }}
       />
@@ -404,6 +435,32 @@ const FileItem = ({ depth, selected, name, type }) => {
         }}
       >
         {name}
+      </span>
+      {(uploading || state === "pending") && (
+        <IconShell
+          icon={
+            (uploading && LineArrowUp) || (state === "pending" && LineArrowDown)
+          }
+          style={{
+            color:
+              (uploading && Colors.success) ||
+              (state === "pending" && Colors.warning),
+          }}
+        />
+      )}
+      <span
+        style={{
+          display: "inline-block",
+          color: "rgba(0, 0, 0, 0.4)",
+          fontSize: "12px",
+          fontWeight: "normal",
+          userSelect: "none",
+          alignSelf: "center",
+          marginTop: "4px",
+          gridColumn: 4,
+        }}
+      >
+        {formatByteSize(size)}
       </span>
     </FileItemLayout>
   )

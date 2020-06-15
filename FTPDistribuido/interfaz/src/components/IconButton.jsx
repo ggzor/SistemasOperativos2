@@ -31,7 +31,11 @@ const IconButtonLayout = styled.button`
     margin-right: 6px;
   }
 
-  &:hover {
+  &:disabled {
+    opacity: 0.5;
+  }
+
+  &:hover:not(:disabled) {
     background: rgba(0, 0, 0, 0.1);
   }
 
@@ -40,7 +44,7 @@ const IconButtonLayout = styled.button`
     outline: 0;
   }
 
-  &:active {
+  &:active:not(:disabled) {
     background: rgba(0, 0, 0, 0.7);
     color: white;
     outline: 0;
