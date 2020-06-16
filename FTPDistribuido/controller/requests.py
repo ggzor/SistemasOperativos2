@@ -203,7 +203,6 @@ class RemoteFSUpdate:
 
 @processRequest.register
 def _(update: RemoteFSUpdate, state: State):
-    print("Update from FS", update.name)
     return UpdateFS(update.name, update.fileSystem), []
 
 
@@ -222,6 +221,47 @@ def _(request: GetFS, state: State):
 
 
 @dataclass
-class TransferComplete:
-    path: str
+class PullComplete:
+    dest: str
+    destPath: Path
+    src: str
+    srcPath: Path
     key: str
+
+
+@processRequest.register
+def _(request: PullComplete, state: State):
+    def mutateState(state: State):
+        computer = state.find_computer(request.dest)
+        localFile = computer.find_file(str(request.destPath))
+
+        localFile.state = "ready"
+        localFile.metadata = None
+
+    return MutateState(mutateState), []
+
+
+@dataclass
+class SendComplete:
+    dest: str
+    destPath: Path
+    src: str
+    srcPath: Path
+    key: str
+
+
+@processRequest.register
+def _(request: SendComplete, state: State):
+    def mutateState(state: State):
+        computer = state.find_computer(request.src)
+        localFile = computer.find_file(str(request.srcPath))
+
+        if request.key in localFile.uploads:
+            localFile.uploads.remove(request.key)
+
+    return MutateState(mutateState), []
+
+
+@processRequest.register
+def _(req: ForceFSUpdate, state: State):
+    return req, []

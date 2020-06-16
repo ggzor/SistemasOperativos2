@@ -27,6 +27,14 @@ argumentsParser.add_argument(
 )
 
 argumentsParser.add_argument(
+    "--pullServerPort",
+    default=50001,
+    type=int,
+    help="El puerto a donde se escuchan las solicitudes de archivos",
+)
+
+
+argumentsParser.add_argument(
     "--stateFile",
     default="main.state",
     help="El archivo en el que se guardarán los datos del programa",

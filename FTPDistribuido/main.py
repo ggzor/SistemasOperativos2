@@ -16,10 +16,10 @@ from asyncqt import QEventLoop
 
 args = argumentsParser.parse_args()
 
-# logging.basicConfig(filename=args.logFile, filemode="w", level=args.logging)
+logging.basicConfig(filename=args.logFile, filemode="w", level=args.logging)
 
 # Redirección de errores no relevantes
-# sys.stderr = open("main.err.log", "w")
+sys.stderr = open("main.err.log", "w")
 
 
 uiPath = QUrl.fromLocalFile(QDir.current().filePath("ui/index.html"))

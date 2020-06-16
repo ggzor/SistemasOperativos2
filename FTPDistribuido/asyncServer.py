@@ -1,13 +1,17 @@
-from utils import readObject, writeObject
-
 import asyncio
-import struct
-import pickle
 import logging
+import pickle
+import struct
 import traceback
-
 from dataclasses import dataclass
-from typing import Any, AsyncIterable, Callable, Union, Optional
+from typing import Any, AsyncIterable, Callable, Optional, Union
+
+from rx import operators as ops
+from rx.scheduler.eventloop import AsyncIOScheduler
+from rx.core.notification import OnNext, OnError
+from rx.core.typing import Observable
+
+from utils import readObject, writeObject
 
 ## Tipos para las respuestas
 
@@ -143,3 +147,27 @@ async def streamQueueWithAcknowledge(queue, pending, commit):
 
         pending.append(await queue.get())
         isFromQueue = True
+
+
+async def asGenerator(obs):
+    queue = asyncio.Queue()
+
+    def on_next(i):
+        queue.put_nowait(i)
+
+    disposable = obs.pipe(ops.materialize()).subscribe(
+        on_next=on_next, scheduler=AsyncIOScheduler(loop=asyncio.get_event_loop())
+    )
+
+    while True:
+        i = await queue.get()
+        if isinstance(i, OnNext):
+            yield i.value
+            queue.task_done()
+        elif isinstance(i, OnError):
+            disposable.dispose()
+            print("EXCEPTION IN GEN", i.value)
+            break
+        else:
+            disposable.dispose()
+            break

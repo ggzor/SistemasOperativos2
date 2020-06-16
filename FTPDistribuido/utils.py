@@ -24,6 +24,10 @@ async def readObject(reader):
     return pickle.loads(await reader.read(size))
 
 
+def readObjectSync(reader):
+    pass
+
+
 async def writeObject(writer, obj):
     obj = pickle.dumps(obj)
     writer.write(struct.pack("@I", len(obj)))

@@ -3,6 +3,8 @@ from controller.file_watcher import watchFileSystem
 from controller.file_system_update_watcher import watchRemoteFS
 from controller.requests import processRequest
 from controller.state import State
+from controller.pull import pullClient, pullServer
+from controller.updater import forcedUpdate
 
 from arbiter.requests import Register
 from arbiter.health_check import healthy_server
@@ -51,13 +53,20 @@ async def controller(uiMessages, sendUIMessage, config):
             config.arbiterHost,
             config.arbiterPort,
             Register(
-                state.name, config.requestsPort, config.folder, config.healthCheckPort
+                state.name,
+                config.requestsPort,
+                config.pullServerPort,
+                config.folder,
+                config.healthCheckPort,
             ),
         ),
         server(config.requestsPort),
         commiter(state.transactionQueue, state),
         watchFileSystem(state, config),
         watchRemoteFS(state, config),
+        pullClient(state, config),
+        pullServer(state, config),
+        forcedUpdate(state.forceUpdate, state),
     ]
 
     def processMessage(message, state: State):

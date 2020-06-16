@@ -30,6 +30,7 @@ def computer_data_from(client: Node, isLocal) -> ComputerData:
         client.position,
         client.address,
         client.requestsPort,
+        client.pullServerPort,
         client.folder,
         client.replicatedBy,
         client.replicating,
@@ -166,12 +167,51 @@ class StreamFileSystemFrom:
         )
 
 
+ignoreFS = False
+
+
+def solve_conflicts(d1: FileSystem, d2: FileSystem) -> FileSystem:
+    result = {}
+
+    for k1, v1 in d1.files.items():
+        if k1 in d2.files:
+            if len(v1.deletes):
+                result[k1] = v1
+            else:
+                result[k1] = d2.files[k1]
+        else:
+            result[k1] = v1
+
+    return FileSystem(result)
+
+
 @dataclass
 class UpdateFS:
     name: str
     fileSystem: FileSystem
 
     def run(self, state: State, request, conf):
+        global ignoreFS
+        updated = state.find_computer(self.name)
+
+        if updated.fileSystem == None:
+            updated.fileSystem = self.fileSystem
+        elif self.name == state.current_computer.replicatedBy:
+            if updated.fileSystem != self.fileSystem:
+                if ignoreFS:
+                    return
+
+                original = solve_conflicts(updated.fileSystem, self.fileSystem)
+                other = solve_conflicts(self.fileSystem, updated.fileSystem)
+
+                updated.fileSystem = original
+
+                ignoreFS = True
+                state.forceUpdate.put_nowait((self.name, other))
+                return
+            else:
+                ignoreFS = False
+
         state.find_computer(self.name).fileSystem = self.fileSystem
 
 
@@ -181,3 +221,11 @@ class AnswerRequestWith:
 
     def run(self, state: State, request: Request, conf):
         request.respond(Response(self.obj))
+
+
+@dataclass
+class ForceFSUpdate:
+    fs: FileSystem
+
+    def run(self, state: State, request: Request, conf):
+        state.current_computer.fileSystem = self.fs

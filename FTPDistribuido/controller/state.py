@@ -195,6 +195,7 @@ class ComputerData:
     position: int
     address: str
     requestsPort: int
+    pullServerPort: int
     folder: str
     # Quien lo replica
     replicatedBy: Optional[str]  # Relevante
@@ -233,6 +234,7 @@ class State:
     )
     # Ignorar
     topologyUpdate: asyncio.Queue = field(default_factory=asyncio.Queue)
+    forceUpdate: asyncio.Queue = field(default_factory=asyncio.Queue)
 
     @property
     def accessible_computers(self):
@@ -257,6 +259,7 @@ class State:
         "transactionQueue": lambda: asyncio.Queue(),
         "fileSystemUpdate": lambda: BehaviorSubject(None),
         "topologyUpdate": asyncio.Queue,
+        "forceUpdate": asyncio.Queue,
     }
 
     # Específico de pickle

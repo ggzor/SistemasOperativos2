@@ -14,6 +14,7 @@ class Client:
     name: str
     address: str
     requestsPort: int
+    pullServerPort: int
     folder: str
     state: str
     replicating: List[str]

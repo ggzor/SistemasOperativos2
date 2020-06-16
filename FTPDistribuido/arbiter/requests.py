@@ -1,8 +1,10 @@
 from .state import allAddresses, allNames, State
 from .actions import *
 
+
 from asyncServer import Request
 
+from pathlib import Path
 from dataclasses import dataclass
 from functools import singledispatch
 
@@ -16,6 +18,7 @@ def processRequest(request, state: State, fullRequest: Request):
 class Register:
     name: str
     requestsPort: int
+    pullServerPort: int
     folder: str
     healthCheck: int = 4321
 
@@ -27,7 +30,11 @@ def _(request: Register, state: State, fullRequest: Request):
     if request.name not in names:
         return (
             RegisterNewClient(
-                request.name, request.requestsPort, request.folder, request.healthCheck
+                request.name,
+                request.requestsPort,
+                request.pullServerPort,
+                request.folder,
+                request.healthCheck,
             ),
             StreamClient(request.name),
         )
