@@ -1,0 +1,16 @@
+Para la ejecución de este programa se deben seguir los
+siguientes pasos:
+
+1. Instalar el framework Qt >= 5.15
+2. Tener disponible en las variables de entorno el comando qmake
+3. Ejecutar: pip3 install --user poetry
+   Para agregar el administrador de entornos virtuales de Python
+4. Ejecutar: poetry install
+   Para obtener todas las dependencias a instalar
+5. Ejecutar: poetry shell
+   Para activar el entorno virtual en el que se encuentran
+   las dependencias
+6. Ejecutar: python arbiter.py
+   Para ejecutar el servidor central que coordina la topología
+7. Ejecutar: python main.py --help
+   Para conocer las opciones para ejecutar los nodos
